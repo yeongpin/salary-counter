@@ -2,6 +2,9 @@
 
 A application that calculates real-time earnings per second based on monthly salary, working days, and hours.
 
+![img](./image/Preview_2025-05-05_17-18-19.png)
+![img](./image/Preview_2025-05-05_17-22-03.png)
+
 ## Features
 
 - Calculate salary per second based on monthly income and working time
