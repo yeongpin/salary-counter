@@ -1,0 +1,61 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: var(--el-font-family);
+    background: transparent;
+    overflow: hidden;
+  }
+  
+  #app {
+    height: 100vh;
+    width: 100vw;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  /* Element Plus 自定義主題 */
+  :root {
+    --el-color-primary: #409eff;
+    --el-border-radius-base: 4px;
+    --el-color-success: #67c23a;
+  } 
+  
+  /* Fix for icon colors */
+  .el-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Ensure active state is visible */
+  .button.active .el-icon {
+    color: var(--el-color-success) !important;
+  } 
+  
+  /* Improve slider appearance */
+  .el-slider__runway {
+    margin: 16px 0;
+  }
+  
+  /* Make dropdowns more responsive */
+  .el-dropdown-menu {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .el-form-item {
+      margin-bottom: 16px;
+    }
+  }
+  
+  @media (max-height: 600px) {
+    .el-form-item {
+      margin-bottom: 12px;
+    }
+  } 

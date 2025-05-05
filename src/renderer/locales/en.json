@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "Salary Calculator",
+    "appName": "Salary Calculator",
+    "appVersion": "1.0.0"
+  },
+  "calculator": {
+    "title": "Real-time Salary Calculator"
+  },
+  "salary": {
+    "monthly": "Monthly Salary",
+    "days": "Working Days per Month",
+    "hours": "Working Hours per Day",
+    "perSecond": "Per-second Earnings",
+    "earned": "Amount Earned"
+  },
+  "button": {
+    "calculate": "Calculate",
+    "start": "Start Counter",
+    "stop": "Stop Counter"
+  },
+  "titleBar": {
+    "opacity": "Opacity",
+    "pin": "Pin Window",
+    "minimize": "Minimize",
+    "close": "Close",
+    "settings": "Settings",
+    "title": "Salary Calculator"
+  },
+  "closeConfirm": {
+    "title": "Close Application",
+    "message": "Do you want to exit or minimize the application?",
+    "minimize": "Minimize",
+    "exit": "Exit"
+  }
+} 

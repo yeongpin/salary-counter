@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "薪資計算器",
+    "appName": "薪資計算器",
+    "appVersion": "1.0.0"
+  },
+  "calculator": {
+    "title": "即時薪資計算器"
+  },
+  "salary": {
+    "monthly": "月薪",
+    "days": "每月工作天數",
+    "hours": "每天工作小時數",
+    "perSecond": "每秒收入",
+    "earned": "已賺取金額"
+  },
+  "button": {
+    "calculate": "計算",
+    "start": "開始計時",
+    "stop": "停止計時"
+  },
+  "titleBar": {
+    "opacity": "透明度",
+    "pin": "固定視窗",
+    "minimize": "最小化",
+    "close": "關閉",
+    "settings": "設定",
+    "title": "薪資計算器"
+  },
+  "closeConfirm": {
+    "title": "關閉應用程式",
+    "message": "您想要退出還是最小化應用程式？",
+    "minimize": "最小化",
+    "exit": "退出"
+  }
+} 
