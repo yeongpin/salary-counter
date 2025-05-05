@@ -203,6 +203,7 @@ const formatCurrency = (value, isEarned = false, isTooltip = false) => {
   // For tooltips, use more decimal places
   const places = isTooltip ? 6 : (isEarned ? 2 : decimalPlaces.value);
   
+  // Get currency symbol
   let symbol = '';
   switch (currency.value) {
     case 'USD': symbol = '$'; break;
@@ -219,13 +220,8 @@ const formatCurrency = (value, isEarned = false, isTooltip = false) => {
     return `${symbol}${value.toFixed(places)}`;
   }
   
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency.value,
-    currencyDisplay: 'symbol',
-    minimumFractionDigits: places,
-    maximumFractionDigits: places
-  }).format(value);
+  // For regular display, use Intl.NumberFormat for better formatting
+  return `${symbol}${value.toFixed(places)}`;
 };
 
 // Calculate salary
