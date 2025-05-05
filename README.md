@@ -1,13 +1,15 @@
 # Salary Calculator
 
-A desktop application that calculates real-time earnings per second based on monthly salary, working days, and hours.
+A application that calculates real-time earnings per second based on monthly salary, working days, and hours.
 
 ## Features
 
 - Calculate salary per second based on monthly income and working time
 - Real-time counter showing earnings accumulation
 - Start/Stop functionality to control the counter
-- Language switching between English and Traditional Chinese
+- Visual water wave animation showing earnings progress
+- Dark mode and light mode themes
+- Language switching between English, Simplified Chinese, and Traditional Chinese
 - Settings saved between sessions
 
 ## Development
@@ -26,9 +28,9 @@ A desktop application that calculates real-time earnings per second based on mon
    ```
 3. Run in development mode:
    ```
-   npm run electron:dev
+   npm run dev
    ```
 
-### Build
+## License
 
-To build the application for production: 
+AGPL-3.0

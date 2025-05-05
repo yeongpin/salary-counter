@@ -1,6 +1,6 @@
 <template>
-  <div class="app-container">
-    <!-- 侧边栏 -->
+  <div class="app-container" :class="{ 'dark-mode': isDarkMode }">
+    <!-- Sidebar -->
     <div class="sidebar" :class="{ 'sidebar-expanded': sidebarExpanded }">
       <div class="sidebar-toggle" @click="toggleSidebar">
         <el-icon><Setting /></el-icon>
@@ -13,8 +13,19 @@
           <label>{{ t('settings.language') }}</label>
           <el-select v-model="currentLocale" @change="changeLanguage">
             <el-option value="en" label="English" />
+            <el-option value="zh-CN" label="简体中文" />
             <el-option value="zh-TW" label="繁體中文" />
           </el-select>
+        </div>
+        
+        <div class="setting-group">
+          <label>{{ t('settings.theme') }}</label>
+          <el-switch
+            v-model="isDarkMode"
+            :active-text="t('settings.darkMode')"
+            :inactive-text="t('settings.lightMode')"
+            @change="toggleTheme"
+          />
         </div>
         
         <div class="setting-group">
@@ -93,7 +104,7 @@
       </div>
     </div>
     
-    <!-- 主内容区 -->
+    <!-- Main content area -->
     <div class="main-content">
       <div class="calculator-container">
         <div class="earnings-rate-display">
@@ -158,17 +169,25 @@ const earnedAmount = ref(0);
 const isRunning = ref(false);
 const currency = ref('USD');
 const decimalPlaces = ref(2);
+// Default to dark mode, unless explicitly set to light mode in local storage
+const isDarkMode = ref(localStorage.getItem('darkMode') !== 'false');
 let countInterval = null;
 let animationFrame = null;
 let lastTimestamp = null;
 
-// 切换语言
+// Switch language
 const changeLanguage = (lang) => {
   locale.value = lang;
   localStorage.setItem('language', lang);
 };
 
-// 计算各种薪资率
+// Switch theme
+const toggleTheme = (value) => {
+  isDarkMode.value = value;
+  localStorage.setItem('darkMode', value ? 'true' : 'false');
+};
+
+// Calculate various salary rates
 const dailyRate = computed(() => {
   return monthlySalary.value / workingDays.value;
 });
@@ -185,22 +204,26 @@ const secondRate = computed(() => {
   return minuteRate.value / 60;
 });
 
-// 计算水波填充百分比
+// Calculate water wave fill percentage
 const fillPercentage = computed(() => {
-  // 假设最大值为月薪的1%
-  const maxValue = monthlySalary.value * 0.01;
+  // 使用日薪作为最大值，这样需要工作一整天才能填满
+  const maxValue = dailyRate.value;
   return Math.min(earnedAmount.value / maxValue * 100, 100);
 });
 
-// 获取进度颜色
+// Get progress color
 const getProgressColor = () => {
   const percentage = fillPercentage.value;
-  if (percentage < 33) return 'red';
-  if (percentage < 66) return 'orange';
-  return 'green';
+  if (percentage < 33) {
+    return 'red';
+  } else if (percentage < 66) {
+    return 'orange';
+  } else {
+    return 'green';
+  }
 };
 
-// 格式化货币显示
+// Format currency display
 const formatCurrency = (value, isEarned = false, forTooltip = false) => {
   const places = forTooltip ? 6 : (isEarned ? decimalPlaces.value : 2);
   const formatter = new Intl.NumberFormat(undefined, {
@@ -212,9 +235,9 @@ const formatCurrency = (value, isEarned = false, forTooltip = false) => {
   return formatter.format(value);
 };
 
-// 计算薪资
+// Calculate salary
 const calculateSalary = () => {
-  // 保存设置到本地存储
+  // Save settings to local storage
   localStorage.setItem('monthlySalary', monthlySalary.value);
   localStorage.setItem('workingDays', workingDays.value);
   localStorage.setItem('workingHours', workingHours.value);
@@ -222,7 +245,12 @@ const calculateSalary = () => {
   localStorage.setItem('decimalPlaces', decimalPlaces.value);
 };
 
-// 切换计数器
+// Toggle sidebar
+const toggleSidebar = () => {
+  sidebarExpanded.value = !sidebarExpanded.value;
+};
+
+// Toggle counter
 const toggleCounter = () => {
   if (isRunning.value) {
     stopCounter();
@@ -231,24 +259,20 @@ const toggleCounter = () => {
   }
 };
 
-// 开始计数器
+// Start counter
 const startCounter = () => {
   if (isRunning.value) return;
   
   isRunning.value = true;
   lastTimestamp = Date.now();
   
-  // 使用requestAnimationFrame实现更平滑的更新
+  // Use requestAnimationFrame for smoother updates
   const updateEarnings = () => {
     const now = Date.now();
     const elapsed = now - lastTimestamp;
     lastTimestamp = now;
     
-    // 计算这段时间内赚取的金额
     earnedAmount.value += (secondRate.value * elapsed / 1000);
-    
-    // 保存到本地存储
-    localStorage.setItem('earnedAmount', earnedAmount.value);
     
     if (isRunning.value) {
       animationFrame = requestAnimationFrame(updateEarnings);
@@ -258,7 +282,7 @@ const startCounter = () => {
   animationFrame = requestAnimationFrame(updateEarnings);
 };
 
-// 停止计数器
+// Stop counter
 const stopCounter = () => {
   isRunning.value = false;
   
@@ -266,21 +290,37 @@ const stopCounter = () => {
     cancelAnimationFrame(animationFrame);
     animationFrame = null;
   }
+  
+  // Save earned amount to local storage
+  localStorage.setItem('earnedAmount', earnedAmount.value);
 };
 
-// 重置收益
+// Reset earnings
 const resetEarnings = () => {
   earnedAmount.value = 0;
   localStorage.setItem('earnedAmount', 0);
 };
 
-// 切换侧边栏
-const toggleSidebar = () => {
-  sidebarExpanded.value = !sidebarExpanded.value;
-};
-
-// 从本地存储加载设置
-const loadSettings = () => {
+// When component mounts
+onMounted(() => {
+  // Check language setting in local storage
+  const savedLanguage = localStorage.getItem('language');
+  if (savedLanguage) {
+    locale.value = savedLanguage;
+    currentLocale.value = savedLanguage;
+  }
+  
+  // Check theme setting in local storage
+  // If not set, default to dark mode
+  const savedTheme = localStorage.getItem('darkMode');
+  if (savedTheme === null) {
+    localStorage.setItem('darkMode', 'true');
+    isDarkMode.value = true;
+  } else {
+    isDarkMode.value = savedTheme !== 'false';
+  }
+  
+  // Load settings from local storage
   const savedMonthlySalary = localStorage.getItem('monthlySalary');
   const savedWorkingDays = localStorage.getItem('workingDays');
   const savedWorkingHours = localStorage.getItem('workingHours');
@@ -294,59 +334,18 @@ const loadSettings = () => {
   if (savedCurrency) currency.value = savedCurrency;
   if (savedDecimalPlaces) decimalPlaces.value = Number(savedDecimalPlaces);
   if (savedEarnedAmount) earnedAmount.value = Number(savedEarnedAmount);
-};
-
-// 组件挂载时
-onMounted(() => {
-  loadSettings();
-  calculateSalary();
-  
-  // 添加页面可见性变化监听
-  document.addEventListener('visibilitychange', handleVisibilityChange);
 });
 
-// 组件卸载前
+// Before component unmounts
 onBeforeUnmount(() => {
-  stopCounter();
-  document.removeEventListener('visibilitychange', handleVisibilityChange);
-});
-
-// 处理页面可见性变化
-const handleVisibilityChange = () => {
-  if (document.hidden) {
-    // 页面不可见时暂停计数
-    if (isRunning.value) {
-      stopCounter();
-    }
-  } else {
-    // 页面可见时恢复计数
-    if (isRunning.value) {
-      startCounter();
-    }
+  if (isRunning.value) {
+    stopCounter();
   }
-};
+});
 </script>
 
-<style>
-:root {
-  --sidebar-width: 60px;
-  --sidebar-expanded-width: 320px;
-  --primary-color: #3b46d3;
-  --primary-light: #e6e9fc;
-  --text-color: #333;
-  --background-color: #f5f7fa;
-  --card-background: #ffffff;
-  --transition-speed: 0.3s;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
-}
-
+<style scoped>
+/* Base styles */
 .app-container {
   position: relative;
   width: 100%;
@@ -354,9 +353,41 @@ body {
   display: flex;
   background-color: var(--background-color);
   overflow: hidden;
+  transition: all 0.3s ease;
+  color: var(--text-color);
 }
 
-/* 侧边栏样式 */
+/* Dark mode */
+.dark-mode {
+  --background-color: #1a1a1a;
+  --text-color: #f5f5f5;
+  --border-color: #333;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --card-background: #2a2a2a;
+  --primary-color: #6c8cff;
+  --secondary-color: #4caf50;
+  --input-background: #333;
+  --slider-background: #444;
+  --scrollbar-thumb: #555;
+  --scrollbar-track: #333;
+}
+
+/* Light mode - default */
+:root {
+  --background-color: #f5f7fa;
+  --text-color: #333;
+  --border-color: #e4e7ed;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --card-background: #ffffff;
+  --primary-color: #3b46d3;
+  --secondary-color: #4caf50;
+  --input-background: #ffffff;
+  --slider-background: #e4e7ed;
+  --scrollbar-thumb: #c0c4cc;
+  --scrollbar-track: #f5f7fa;
+}
+
+/* Sidebar styles */
 .sidebar {
   position: fixed;
   left: 20px;
@@ -375,7 +406,7 @@ body {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px var(--shadow-color);
   transition: transform 0.3s ease;
   z-index: 101;
 }
@@ -393,12 +424,32 @@ body {
   bottom: 60px;
   left: 0;
   width: 300px;
-  background-color: white;
+  background-color: var(--card-background);
   border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px var(--shadow-color);
   padding: 20px;
   overflow-y: auto;
   max-height: 80vh;
+  color: var(--text-color);
+}
+
+/* Custom scrollbar */
+.sidebar-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
 }
 
 .sidebar-title {
@@ -415,11 +466,69 @@ body {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
+  color: var(--text-color);
 }
 
-.setting-group .el-input-number,
-.setting-group .el-select {
+/* Custom Element Plus component styles */
+:deep(.el-input-number) {
   width: 100%;
+}
+
+:deep(.el-input__wrapper) {
+  background-color: var(--input-background) !important;
+  box-shadow: 0 0 0 1px var(--border-color) inset !important;
+}
+
+:deep(.el-input__inner) {
+  color: var(--text-color) !important;
+}
+
+:deep(.el-select) {
+  width: 100%;
+}
+
+:deep(.el-select .el-input__wrapper) {
+  background-color: var(--input-background) !important;
+}
+
+:deep(.el-popper) {
+  background-color: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+:deep(.el-select-dropdown__item) {
+  color: var(--text-color) !important;
+}
+
+:deep(.el-select-dropdown__item.hover) {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+}
+
+:deep(.el-slider__runway) {
+  background-color: var(--slider-background) !important;
+}
+
+:deep(.el-slider__bar) {
+  background-color: var(--primary-color) !important;
+}
+
+:deep(.el-slider__button) {
+  border-color: var(--primary-color) !important;
+  background-color: white !important;
+}
+
+:deep(.el-switch__core) {
+  background-color: var(--slider-background) !important;
+  border-color: var(--border-color) !important;
+}
+
+:deep(.el-switch.is-checked .el-switch__core) {
+  background-color: var(--primary-color) !important;
+}
+
+:deep(.el-switch__label) {
+  color: var(--text-color) !important;
 }
 
 .rates-details {
@@ -435,7 +544,8 @@ body {
 }
 
 .rate-label {
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .rate-value {
@@ -443,7 +553,7 @@ body {
   color: var(--primary-color);
 }
 
-/* 主内容区样式 */
+/* Main content area styles */
 .main-content {
   flex: 1;
   display: flex;
@@ -464,10 +574,10 @@ body {
 }
 
 .earnings-rate-card {
-  background-color: white;
+  background-color: var(--card-background);
   border-radius: 12px;
   padding: 16px 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-color);
   text-align: center;
 }
 
@@ -480,16 +590,19 @@ body {
 
 .earnings-rate-label {
   font-size: 16px;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
-/* 水波进度圆圈样式 */
+/* Water wave container styles */
 .water-container {
   margin-bottom: 30px;
 }
 
 .progress-wrapper {
-  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .progress {
@@ -498,7 +611,7 @@ body {
   height: 250px;
   border-radius: 50%;
   border: 5px solid var(--primary-color);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 20px var(--shadow-color);
   transition: all 1s ease;
 }
 
@@ -511,6 +624,7 @@ body {
   height: 240px;
   border: 5px solid var(--background-color);
   transition: all 1s ease;
+  background-color: var(--card-background);
 }
 
 .progress .inner .water {
@@ -566,11 +680,35 @@ body {
 
 .progress .inner .percent .earned-label {
   font-size: 16px;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
   font-weight: normal;
 }
 
-/* 颜色变化 */
+/* Button styles */
+:deep(.el-button) {
+  border-color: transparent;
+}
+
+:deep(.el-button--success) {
+  background-color: var(--secondary-color);
+}
+
+:deep(.el-button--danger) {
+  background-color: #f56c6c;
+}
+
+:deep(.el-button--warning) {
+  background-color: #e6a23c;
+}
+
+:deep(.el-button:disabled) {
+  background-color: var(--slider-background);
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
+/* Color change */
 .red .progress {
   border-color: #ed3b3b;
 }
@@ -633,7 +771,7 @@ body {
   font-size: 18px;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .progress {
     width: 200px;

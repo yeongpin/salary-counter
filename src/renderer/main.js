@@ -5,16 +5,18 @@ import 'element-plus/dist/index.css'
 import App from './App.vue'
 import enMessages from './locales/en.json'
 import zhTWMessages from './locales/zh-TW.json'
+import zhCNMessages from './locales/zh-CN.json'
 import './styles/main.css'
 
 // Create i18n instance
 const i18n = createI18n({
   legacy: false,
-  locale: navigator.language || 'en',
+  locale: localStorage.getItem('language') || 'en',
   fallbackLocale: 'en',
   messages: {
     en: enMessages,
-    'zh-TW': zhTWMessages
+    'zh-TW': zhTWMessages,
+    'zh-CN': zhCNMessages
   }
 })
 

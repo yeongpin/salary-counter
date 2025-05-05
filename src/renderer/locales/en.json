@@ -23,6 +23,9 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
+    "theme": "Theme",
+    "darkMode": "Dark",
+    "lightMode": "Light",
     "advanced": "Advanced Settings",
     "decimalPlaces": "Decimal Places"
   },

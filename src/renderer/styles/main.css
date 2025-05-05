@@ -19,18 +19,19 @@
     max-height: 100%;
   }
   
-  /* Element Plus 自定義主題 */
-  :root {
-    --el-color-primary: #409eff;
-    --el-border-radius-base: 4px;
-    --el-color-success: #67c23a;
-    --primary-color: #3b46d3;
-    --secondary-color: #4caf50;
-    --background-color: #f5f7fa;
-    --text-color: #333;
-    --border-color: #e4e7ed;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-  } 
+  /* Element Plus Custom Theme */
+    :root {
+      --el-color-primary: #409eff;
+      --el-border-radius-base: 4px;
+      --el-color-success: #67c23a;
+      --primary-color: #3b46d3;
+      --secondary-color: #4caf50;
+      --background-color: #f5f7fa;
+      --text-color: #333;
+      --border-color: #e4e7ed;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --card-background: #fff;
+    } 
   
   /* Fix for icon colors */
   .el-icon {

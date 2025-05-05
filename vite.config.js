@@ -4,6 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [vue()],
+  base: '/',
   root: 'src/renderer',
   publicDir: '../../public',
   resolve: {
@@ -16,7 +17,8 @@ export default defineConfig({
     open: true
   },
   build: {
-    outDir: path.resolve(__dirname, 'dist'),
+    outDir: 'dist',
+    assetsDir: 'assets',
     emptyOutDir: true
   }
 }) 
