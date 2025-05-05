@@ -11,13 +11,26 @@
     "monthly": "月薪",
     "days": "每月工作天數",
     "hours": "每天工作小時數",
+    "daily": "日薪",
+    "hourly": "時薪",
+    "minute": "分鐘薪資",
     "perSecond": "每秒收入",
-    "earned": "已賺取金額"
+    "perSecondInfo": "根據您的月薪和工作時間計算的每秒收入。",
+    "earned": "已賺取金額",
+    "currency": "貨幣",
+    "second": "秒"
+  },
+  "settings": {
+    "title": "設置",
+    "language": "語言",
+    "advanced": "高級設置",
+    "decimalPlaces": "小數位數"
   },
   "button": {
     "calculate": "計算",
     "start": "開始計時",
-    "stop": "停止計時"
+    "stop": "停止計時",
+    "reset": "重置"
   },
   "titleBar": {
     "opacity": "透明度",

@@ -5,8 +5,10 @@
   }
   
   body {
-    font-family: var(--el-font-family);
-    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
     overflow: hidden;
   }
   
@@ -22,6 +24,12 @@
     --el-color-primary: #409eff;
     --el-border-radius-base: 4px;
     --el-color-success: #67c23a;
+    --primary-color: #3b46d3;
+    --secondary-color: #4caf50;
+    --background-color: #f5f7fa;
+    --text-color: #333;
+    --border-color: #e4e7ed;
+    --shadow-color: rgba(0, 0, 0, 0.1);
   } 
   
   /* Fix for icon colors */

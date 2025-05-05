@@ -11,13 +11,26 @@
     "monthly": "Monthly Salary",
     "days": "Working Days per Month",
     "hours": "Working Hours per Day",
+    "daily": "Daily Rate",
+    "hourly": "Hourly Rate",
+    "minute": "Minute Rate",
     "perSecond": "Per-second Earnings",
-    "earned": "Amount Earned"
+    "perSecondInfo": "This is how much you earn every second based on your monthly salary and working hours.",
+    "earned": "Amount Earned",
+    "currency": "Currency",
+    "second": "second"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "advanced": "Advanced Settings",
+    "decimalPlaces": "Decimal Places"
   },
   "button": {
     "calculate": "Calculate",
     "start": "Start Counter",
-    "stop": "Stop Counter"
+    "stop": "Stop Counter",
+    "reset": "Reset"
   },
   "titleBar": {
     "opacity": "Opacity",

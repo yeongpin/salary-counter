@@ -4,24 +4,19 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [vue()],
-  base: process.env.NODE_ENV === 'development' ? '/' : '',
-  root: path.join(__dirname, 'src/renderer'),
-  publicDir: 'public',
-  build: {
-    outDir: path.join(__dirname, 'dist/renderer'),
-    emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        format: 'iife',
-      }
+  root: 'src/renderer',
+  publicDir: '../../public',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
     }
   },
   server: {
-    port: 2512
+    port: 3000,
+    open: true
   },
-  resolve: {
-    alias: {
-      '@': path.join(__dirname, 'src/renderer')
-    }
+  build: {
+    outDir: path.resolve(__dirname, 'dist'),
+    emptyOutDir: true
   }
 }) 

@@ -3,18 +3,18 @@ import { createI18n } from 'vue-i18n'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import App from './App.vue'
-import enLocale from './locales/en.json'
-import zhTWLocale from './locales/zh-TW.json'
-import './styles/main.css';
+import enMessages from './locales/en.json'
+import zhTWMessages from './locales/zh-TW.json'
+import './styles/main.css'
 
 // Create i18n instance
 const i18n = createI18n({
   legacy: false,
-  locale: localStorage.getItem('language') || 'en',
+  locale: navigator.language || 'en',
   fallbackLocale: 'en',
   messages: {
-    en: enLocale,
-    'zh-TW': zhTWLocale
+    en: enMessages,
+    'zh-TW': zhTWMessages
   }
 })
 

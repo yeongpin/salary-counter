@@ -1,92 +1,138 @@
 <template>
   <div class="salary-calculator">
-    <h2 class="calculator-title">{{ t('calculator.title') }}</h2>
     
-    <div class="input-group">
-      <label for="monthly-salary">{{ t('salary.monthly') }}</label>
-      <el-input-number
-        id="monthly-salary"
-        v-model="monthlySalary"
-        :min="0"
-        :step="1000"
-        controls-position="right"
-        @change="calculateSalary"
-      />
-    </div>
-    
-    <div class="input-group">
-      <label for="working-days">{{ t('salary.days') }}</label>
-      <el-input-number
-        id="working-days"
-        v-model="workingDays"
-        :min="1"
-        :max="31"
-        :step="1"
-        controls-position="right"
-        @change="calculateSalary"
-      />
-    </div>
-    
-    <div class="input-group">
-      <label for="working-hours">{{ t('salary.hours') }}</label>
-      <el-input-number
-        id="working-hours"
-        v-model="workingHours"
-        :min="1"
-        :max="24"
-        :step="0.5"
-        controls-position="right"
-        @change="calculateSalary"
-      />
-    </div>
-    
-    <el-button 
-      type="primary" 
-      class="calculate-button" 
-      @click="calculateSalary"
-    >
-      {{ t('button.calculate') }}
-    </el-button>
-    
-    <div class="results">
-      <div class="result-item">
-        <span class="result-label">Daily Rate:</span>
-        <span class="result-value">{{ formatCurrency(dailyRate) }}</span>
-      </div>
-      <div class="result-item">
-        <span class="result-label">Hourly Rate:</span>
-        <span class="result-value">{{ formatCurrency(hourlyRate) }}</span>
-      </div>
-      <div class="result-item">
-        <span class="result-label">Minute Rate:</span>
-        <span class="result-value">{{ formatCurrency(minuteRate) }}</span>
-      </div>
-      <div class="result-item">
-        <span class="result-label">{{ t('salary.perSecond') }}</span>
-        <span class="result-value">{{ formatCurrency(secondRate) }}</span>
-      </div>
-    </div>
-    
-    <div class="earned-section" v-if="secondRate > 0">
-      <div class="earned-amount">
-        <div class="earned-label">{{ t('salary.earned') }}</div>
-        <div class="earned-value">{{ formatCurrency(earnedAmount) }}</div>
+    <div class="calculator-layout">
+      <!-- 左侧输入区域 -->
+      <div class="input-section">
+        <div class="input-group">
+          <label for="monthly-salary">{{ t('salary.monthly') }}</label>
+          <el-input-number
+            id="monthly-salary"
+            v-model="monthlySalary"
+            :min="0"
+            :step="1000"
+            controls-position="right"
+            @change="calculateSalary"
+          />
+        </div>
+        
+        <div class="input-group">
+          <label for="working-days">{{ t('salary.days') }}</label>
+          <el-input-number
+            id="working-days"
+            v-model="workingDays"
+            :min="1"
+            :max="31"
+            :step="1"
+            controls-position="right"
+            @change="calculateSalary"
+          />
+        </div>
+        
+        <div class="input-group">
+          <label for="working-hours">{{ t('salary.hours') }}</label>
+          <el-input-number
+            id="working-hours"
+            v-model="workingHours"
+            :min="1"
+            :max="24"
+            :step="0.5"
+            controls-position="right"
+            @change="calculateSalary"
+          />
+        </div>
+        
+        <div class="input-group">
+          <label for="currency">{{ t('salary.currency') }}</label>
+          <el-select v-model="currency" @change="calculateSalary">
+            <el-option value="USD" label="USD ($)" />
+            <el-option value="EUR" label="EUR (€)" />
+            <el-option value="GBP" label="GBP (£)" />
+            <el-option value="JPY" label="JPY (¥)" />
+            <el-option value="CNY" label="CNY (¥)" />
+            <el-option value="TWD" label="TWD (NT$)" />
+          </el-select>
+        </div>
+        
+        <div class="advanced-settings">
+          <div class="settings-header" @click="showAdvancedSettings = !showAdvancedSettings">
+            <span>{{ t('settings.advanced') }}</span>
+            <el-icon :class="{ 'is-rotate': showAdvancedSettings }"><ArrowDown /></el-icon>
+          </div>
+          
+          <div class="settings-content" v-show="showAdvancedSettings">
+            <div class="setting-item">
+              <label for="decimal-places">{{ t('settings.decimalPlaces') }}</label>
+              <el-slider
+                v-model="decimalPlaces"
+                :min="2"
+                :max="6"
+                :step="1"
+                :marks="{2:'2', 3:'3', 4:'4', 5:'5', 6:'6'}"
+                @change="calculateSalary"
+              />
+            </div>
+          </div>
+        </div>
       </div>
       
-      <el-button 
-        :type="isRunning ? 'danger' : 'success'"
-        class="counter-button"
-        @click="toggleCounter"
-      >
-        {{ isRunning ? t('button.stop') : t('button.start') }}
-      </el-button>
+      <!-- 右侧水波效果区域 -->
+      <div class="visualization-section">
+        <el-tooltip :content="t('salary.perSecondInfo')" placement="top">
+          <el-icon class="info-icon-corner"><InfoFilled /></el-icon>
+        </el-tooltip>
+        
+        <div class="earnings-rate-display">
+          <el-tooltip placement="top" :content="getRatesDetails()" raw-content>
+            <div class="earnings-rate-card">
+              <div class="earnings-rate-value">{{ formatCurrency(secondRate) }}</div>
+              <div class="earnings-rate-label">{{ t('salary.perSecond') }}</div>
+            </div>
+          </el-tooltip>
+        </div>
+        
+        <div class="water-container" ref="waterContainer">
+          <div class="water-circle">
+            <div class="water-wave" :style="{ height: `${100 - fillPercentage}%` }">
+              <div class="water-wave-back"></div>
+              <div class="water-wave-front"></div>
+            </div>
+            <div class="earned-display">
+              <div class="earned-amount">{{ formatCurrency(earnedAmount, true) }}</div>
+              <div class="earned-label">{{ t('salary.earned') }}</div>
+            </div>
+          </div>
+          
+          <div class="control-buttons">
+            <el-button 
+              :type="isRunning ? 'danger' : 'success'"
+              class="counter-button"
+              size="large"
+              @click="toggleCounter"
+            >
+              {{ isRunning ? t('button.stop') : t('button.start') }}
+            </el-button>
+            
+            <el-button 
+              type="warning" 
+              class="reset-button"
+              size="large"
+              @click="resetEarnings"
+              :disabled="earnedAmount === 0"
+            >
+              {{ t('button.reset') }}
+            </el-button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { ArrowDown, InfoFilled } from '@element-plus/icons-vue';
 
 const { t } = useI18n();
 const monthlySalary = ref(30000);
@@ -94,7 +140,13 @@ const workingDays = ref(22);
 const workingHours = ref(8);
 const earnedAmount = ref(0);
 const isRunning = ref(false);
+const currency = ref('USD');
+const decimalPlaces = ref(2);
+const showAdvancedSettings = ref(false);
+const waterContainer = ref(null);
 let countInterval = null;
+let animationFrame = null;
+let lastTimestamp = null;
 
 // 计算各种薪资率
 const dailyRate = computed(() => {
@@ -113,24 +165,80 @@ const secondRate = computed(() => {
   return minuteRate.value / 60;
 });
 
+// 获取所有薪资率的详细信息，用于工具提示
+const getRatesDetails = () => {
+  return `<div class="tooltip-rates">
+    <div class="tooltip-rate-item">
+      <span class="tooltip-label">${t('salary.daily')}:</span>
+      <span class="tooltip-value">${formatCurrency(dailyRate.value, false, true)}</span>
+    </div>
+    <div class="tooltip-rate-item">
+      <span class="tooltip-label">${t('salary.hourly')}:</span>
+      <span class="tooltip-value">${formatCurrency(hourlyRate.value, false, true)}</span>
+    </div>
+    <div class="tooltip-rate-item">
+      <span class="tooltip-label">${t('salary.minute')}:</span>
+      <span class="tooltip-value">${formatCurrency(minuteRate.value, false, true)}</span>
+    </div>
+    <div class="tooltip-rate-item">
+      <span class="tooltip-label">${t('salary.perSecond')}:</span>
+      <span class="tooltip-value">${formatCurrency(secondRate.value, false, true)}</span>
+    </div>
+  </div>`;
+};
+
+// 计算水波填充百分比
+const fillPercentage = computed(() => {
+  // 最大值设为1小时的收入
+  const maxValue = hourlyRate.value;
+  // 如果没有收入或最大值为0，返回0%
+  if (earnedAmount.value === 0 || maxValue === 0) return 0;
+  // 计算百分比，最大为95%（留一点空间在顶部）
+  const percentage = Math.min((earnedAmount.value / maxValue) * 100, 95);
+  return percentage;
+});
+
 // 格式化货币
-const formatCurrency = (value) => {
+const formatCurrency = (value, isEarned = false, isTooltip = false) => {
+  // 对于工具提示，使用更多小数位
+  const places = isTooltip ? 6 : (isEarned ? 2 : decimalPlaces.value);
+  
+  let symbol = '';
+  switch (currency.value) {
+    case 'USD': symbol = '$'; break;
+    case 'EUR': symbol = '€'; break;
+    case 'GBP': symbol = '£'; break;
+    case 'JPY': symbol = '¥'; break;
+    case 'CNY': symbol = '¥'; break;
+    case 'TWD': symbol = 'NT$'; break;
+    default: symbol = '$';
+  }
+  
+  // 使用toFixed而不是Intl.NumberFormat，以确保显示所有小数位
+  if (isTooltip) {
+    return `${symbol}${value.toFixed(places)}`;
+  }
+  
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6
+    currency: currency.value,
+    currencyDisplay: 'symbol',
+    minimumFractionDigits: places,
+    maximumFractionDigits: places
   }).format(value);
 };
 
+// 计算薪资
 const calculateSalary = () => {
-  // 保存到本地存储
+  // 保存设置到本地存储
   localStorage.setItem('monthlySalary', monthlySalary.value);
   localStorage.setItem('workingDays', workingDays.value);
   localStorage.setItem('workingHours', workingHours.value);
+  localStorage.setItem('currency', currency.value);
+  localStorage.setItem('decimalPlaces', decimalPlaces.value);
 };
 
-// 开始/停止计数器
+// 切换计数器
 const toggleCounter = () => {
   if (isRunning.value) {
     stopCounter();
@@ -141,54 +249,138 @@ const toggleCounter = () => {
 
 // 开始计数器
 const startCounter = () => {
-  if (!countInterval) {
-    isRunning.value = true;
-    countInterval = setInterval(() => {
-      earnedAmount.value += secondRate.value;
-    }, 1000);
-  }
+  if (isRunning.value) return;
+  
+  isRunning.value = true;
+  lastTimestamp = performance.now();
+  
+  // 使用requestAnimationFrame实现更平滑的动画
+  const updateCounter = (timestamp) => {
+    if (!isRunning.value) return;
+    
+    const elapsed = timestamp - lastTimestamp;
+    lastTimestamp = timestamp;
+    
+    // 计算这段时间内赚取的金额
+    const earned = (secondRate.value * elapsed) / 1000;
+    earnedAmount.value += earned;
+    
+    animationFrame = requestAnimationFrame(updateCounter);
+  };
+  
+  animationFrame = requestAnimationFrame(updateCounter);
 };
 
 // 停止计数器
 const stopCounter = () => {
-  if (countInterval) {
-    clearInterval(countInterval);
-    countInterval = null;
-    isRunning.value = false;
-    localStorage.setItem('earnedAmount', earnedAmount.value);
+  isRunning.value = false;
+  if (animationFrame) {
+    cancelAnimationFrame(animationFrame);
+    animationFrame = null;
   }
 };
 
+// 重置收益
+const resetEarnings = () => {
+  stopCounter();
+  earnedAmount.value = 0;
+};
+
+// 组件挂载时
 onMounted(() => {
-  // 从本地存储加载数据
+  // 从本地存储加载设置
   const savedMonthlySalary = localStorage.getItem('monthlySalary');
   const savedWorkingDays = localStorage.getItem('workingDays');
   const savedWorkingHours = localStorage.getItem('workingHours');
-  const savedEarnedAmount = localStorage.getItem('earnedAmount');
+  const savedCurrency = localStorage.getItem('currency');
+  const savedDecimalPlaces = localStorage.getItem('decimalPlaces');
   
-  if (savedMonthlySalary) monthlySalary.value = Number(savedMonthlySalary);
-  if (savedWorkingDays) workingDays.value = Number(savedWorkingDays);
-  if (savedWorkingHours) workingHours.value = Number(savedWorkingHours);
-  if (savedEarnedAmount) earnedAmount.value = Number(savedEarnedAmount);
+  if (savedMonthlySalary) monthlySalary.value = parseFloat(savedMonthlySalary);
+  if (savedWorkingDays) workingDays.value = parseInt(savedWorkingDays);
+  if (savedWorkingHours) workingHours.value = parseFloat(savedWorkingHours);
+  if (savedCurrency) currency.value = savedCurrency;
+  if (savedDecimalPlaces) decimalPlaces.value = parseInt(savedDecimalPlaces);
+  
+  calculateSalary();
 });
 
+// 组件卸载前
 onBeforeUnmount(() => {
   stopCounter();
 });
 </script>
 
+<style>
+/* 全局样式，不使用scoped，确保工具提示样式生效 */
+.tooltip-rates {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.tooltip-rate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tooltip-label {
+  font-weight: normal;
+  color: #ffffff;
+}
+
+.tooltip-value {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* 确保Element Plus的工具提示允许HTML内容 */
+.el-tooltip__popper {
+  max-width: none !important;
+}
+</style>
+
 <style scoped>
 .salary-calculator {
   padding: 20px;
-  max-width: 600px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .calculator-title {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   color: var(--el-text-color-primary);
-  font-weight: 500;
+}
+
+.calculator-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  margin-bottom: 20px;
+  min-height: 500px; /* 确保有足够的高度 */
+}
+
+.input-section {
+  width: 50%;
+  padding: 20px;
+  background-color: var(--el-fill-color-blank);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.visualization-section {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--el-fill-color-blank);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+  padding: 20px;
 }
 
 .input-group {
@@ -198,70 +390,341 @@ onBeforeUnmount(() => {
 .input-group label {
   display: block;
   margin-bottom: 8px;
-  color: var(--el-text-color-regular);
-}
-
-.calculate-button {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.results {
-  margin-top: 10px;
-  padding: 16px;
-  border-radius: 4px;
-  background-color: var(--el-fill-color-light);
-  margin-bottom: 20px;
-}
-
-.result-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-}
-
-.result-item:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.result-label {
   font-weight: 500;
   color: var(--el-text-color-primary);
 }
 
-.result-value {
-  font-family: monospace;
-  font-size: 1.1em;
-  color: var(--el-color-primary);
+.input-group .el-input-number,
+.input-group .el-select {
+  width: 100%;
 }
 
-.earned-section {
-  margin-top: 20px;
-  padding: 16px;
+.advanced-settings {
+  margin-bottom: 20px;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 4px;
-  background-color: var(--el-color-success-light-9);
-  text-align: center;
+  overflow: hidden;
 }
 
-.earned-label {
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: var(--el-fill-color-light);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.settings-header:hover {
+  background-color: var(--el-fill-color);
+}
+
+.settings-header .is-rotate {
+  transform: rotate(180deg);
+}
+
+.settings-content {
+  padding: 15px;
+  border-top: 1px solid var(--el-border-color-light);
+}
+
+.setting-item {
+  margin-bottom: 15px;
+}
+
+.setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.setting-item label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+}
+
+/* 新的薪资率卡片样式 */
+.rates-summary {
+  margin-top: 20px;
+}
+
+.rates-card {
+  background-color: var(--el-color-primary-light-9);
+  border-radius: 8px;
+  padding: 15px;
+  position: relative;
+  cursor: help;
+  transition: background-color 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rates-card:hover {
+  background-color: var(--el-color-primary-light-8);
+}
+
+.rates-title {
   font-size: 14px;
-  color: var(--el-text-color-regular);
+  color: var(--el-text-color-secondary);
   margin-bottom: 8px;
 }
 
-.earned-value {
+.rates-value {
   font-size: 24px;
   font-weight: bold;
-  color: var(--el-color-success);
-  margin-bottom: 16px;
-  font-family: monospace;
+  color: var(--el-color-primary);
 }
 
-.counter-button {
+.per-second {
+  font-size: 14px;
+  font-weight: normal;
+  color: var(--el-text-color-secondary);
+}
+
+.info-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 16px;
+  color: var(--el-color-info);
+}
+
+.water-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
+  height: 100%;
+}
+
+.water-circle {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.water-wave {
+  position: absolute;
+  width: 220px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: auto;
+  transition: height 0.5s ease;
+  background-color: rgba(var(--el-color-primary-rgb), 0.8);
+  border-radius: 0 0 50% 50%;
+  overflow: hidden;
+}
+
+.water-wave-back {
+  position: absolute;
+  width: 440px;
+  height: 440px;
+  top: 0;
+  left: -110px;
+  background: rgba(var(--el-color-primary-rgb), 0.8);
+  border-radius: 45%;
+  animation: rotate 10s linear infinite;
+}
+
+.water-wave-front {
+  position: absolute;
+  width: 440px;
+  height: 440px;
+  top: 0;
+  left: -110px;
+  background: rgba(var(--el-color-primary-rgb), 0.6);
+  border-radius: 45%;
+  animation: rotate 6s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.earned-display {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.earned-amount {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--el-color-primary-dark-2);
+  margin-bottom: 5px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
+
+.earned-label {
+  font-size: 16px;
+  color: var(--el-text-color-primary);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
+
+.info-icon-corner {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 20px;
+  color: var(--el-color-info);
+  cursor: help;
+  z-index: 20;
+  transition: color 0.3s;
+}
+
+.info-icon-corner:hover {
+  color: var(--el-color-primary);
+}
+
+.control-buttons {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 20px;
+}
+
+.counter-button,
+.reset-button {
+  flex: 1;
+  height: 48px;
+  font-size: 16px;
+}
+
+/* 移除响应式布局，保持水平布局 */
+@media (max-width: 768px) {
+  .calculator-layout {
+    flex-direction: row; /* 保持水平布局 */
+    gap: 15px; /* 减小间距 */
+  }
+  
+  .input-section, 
+  .visualization-section {
+    padding: 15px; /* 减小内边距 */
+  }
+  
+  .water-circle {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .water-wave {
+    width: 180px;
+  }
+  
+  .water-wave-back,
+  .water-wave-front {
+    width: 360px;
+    height: 360px;
+    left: -90px;
+  }
+  
+  .earned-amount {
+    font-size: 20px;
+  }
+  
+  .earned-label {
+    font-size: 14px;
+  }
+  
+  .control-buttons {
+    max-width: 250px;
+  }
+}
+
+/* 超小屏幕适配 */
+@media (max-width: 576px) {
+  .calculator-layout {
+    gap: 10px;
+  }
+  
+  .input-section, 
+  .visualization-section {
+    padding: 10px;
+  }
+  
+  .water-circle {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .water-wave {
+    width: 150px;
+  }
+  
+  .water-wave-back,
+  .water-wave-front {
+    width: 300px;
+    height: 300px;
+    left: -75px;
+  }
+  
+  .earned-amount {
+    font-size: 18px;
+  }
+  
+  .control-buttons {
+    max-width: 200px;
+    gap: 10px;
+  }
+  
+  .counter-button,
+  .reset-button {
+    height: 40px;
+    font-size: 14px;
+  }
+}
+
+.earnings-rate-display {
+  margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.earnings-rate-card {
+  background-color: var(--el-color-primary-light-9);
+  border-radius: 12px;
+  padding: 12px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: help;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.earnings-rate-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.earnings-rate-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--el-color-primary);
+  margin-bottom: 4px;
+}
+
+.earnings-rate-label {
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
 }
 </style> 
