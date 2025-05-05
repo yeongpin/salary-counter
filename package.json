@@ -6,7 +6,8 @@
     "author": "yeongpin",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "clean": "node scripts/clean-dist.js",
+        "build": "npm run clean && vite build",
         "postbuild": "node scripts/copy-to-public.js",
         "serve": "node app.js",
         "start": "npm run build && npm run serve",
