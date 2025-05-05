@@ -4,26 +4,26 @@ const cors = require('cors');
 
 const app = express();
 
-// 中间件
+// middleware
 app.use(express.json());
 app.use(cors());
 
-// 静态文件服务
+// Static file service
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 所有路由都返回 index.html，以支持 SPA 前端路由
+// all routes return index.html to support SPA frontend routing
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 根据环境决定如何启动服务器
+// server start
 if (process.env.NODE_ENV === 'production') {
-  // Phusion Passenger 会自动处理端口
+  // Phusion Passenger will automatically handle the port
   app.listen(() => {
     console.log('Production server is running');
   });
 } else {
-  // 本地开发使用命令行指定的端口
+  // local development use command line specified port
   const defaultPort = 3000;
   const serverPort = process.env.PORT || defaultPort;
   

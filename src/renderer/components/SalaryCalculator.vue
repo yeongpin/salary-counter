@@ -2,7 +2,7 @@
   <div class="salary-calculator">
     
     <div class="calculator-layout">
-      <!-- 左侧输入区域 -->
+      <!-- Left input section -->
       <div class="input-section">
         <div class="input-group">
           <label for="monthly-salary">{{ t('salary.monthly') }}</label>
@@ -76,7 +76,7 @@
         </div>
       </div>
       
-      <!-- 右侧水波效果区域 -->
+      <!-- Right water effect visualization section -->
       <div class="visualization-section">
         <el-tooltip :content="t('salary.perSecondInfo')" placement="top">
           <el-icon class="info-icon-corner"><InfoFilled /></el-icon>
@@ -148,7 +148,7 @@ let countInterval = null;
 let animationFrame = null;
 let lastTimestamp = null;
 
-// 计算各种薪资率
+// Calculate various salary rates
 const dailyRate = computed(() => {
   return monthlySalary.value / workingDays.value;
 });
@@ -165,7 +165,7 @@ const secondRate = computed(() => {
   return minuteRate.value / 60;
 });
 
-// 获取所有薪资率的详细信息，用于工具提示
+// Get detailed information for all salary rates, used for tooltip
 const getRatesDetails = () => {
   return `<div class="tooltip-rates">
     <div class="tooltip-rate-item">
@@ -187,20 +187,20 @@ const getRatesDetails = () => {
   </div>`;
 };
 
-// 计算水波填充百分比
+// Calculate water fill percentage
 const fillPercentage = computed(() => {
-  // 最大值设为1小时的收入
+  // Set maximum value to 1 hour of earnings
   const maxValue = hourlyRate.value;
-  // 如果没有收入或最大值为0，返回0%
+  // If no earnings or max value is 0, return 0%
   if (earnedAmount.value === 0 || maxValue === 0) return 0;
-  // 计算百分比，最大为95%（留一点空间在顶部）
+  // Calculate percentage, max 95% (leave some space at the top)
   const percentage = Math.min((earnedAmount.value / maxValue) * 100, 95);
   return percentage;
 });
 
-// 格式化货币
+// Format currency
 const formatCurrency = (value, isEarned = false, isTooltip = false) => {
-  // 对于工具提示，使用更多小数位
+  // For tooltips, use more decimal places
   const places = isTooltip ? 6 : (isEarned ? 2 : decimalPlaces.value);
   
   let symbol = '';
@@ -214,7 +214,7 @@ const formatCurrency = (value, isEarned = false, isTooltip = false) => {
     default: symbol = '$';
   }
   
-  // 使用toFixed而不是Intl.NumberFormat，以确保显示所有小数位
+  // Use toFixed instead of Intl.NumberFormat to ensure all decimal places are shown
   if (isTooltip) {
     return `${symbol}${value.toFixed(places)}`;
   }
@@ -228,9 +228,9 @@ const formatCurrency = (value, isEarned = false, isTooltip = false) => {
   }).format(value);
 };
 
-// 计算薪资
+// Calculate salary
 const calculateSalary = () => {
-  // 保存设置到本地存储
+  // Save settings to local storage
   localStorage.setItem('monthlySalary', monthlySalary.value);
   localStorage.setItem('workingDays', workingDays.value);
   localStorage.setItem('workingHours', workingHours.value);
@@ -238,7 +238,7 @@ const calculateSalary = () => {
   localStorage.setItem('decimalPlaces', decimalPlaces.value);
 };
 
-// 切换计数器
+// Toggle counter
 const toggleCounter = () => {
   if (isRunning.value) {
     stopCounter();
@@ -247,21 +247,21 @@ const toggleCounter = () => {
   }
 };
 
-// 开始计数器
+// Start counter
 const startCounter = () => {
   if (isRunning.value) return;
   
   isRunning.value = true;
   lastTimestamp = performance.now();
   
-  // 使用requestAnimationFrame实现更平滑的动画
+  // Use requestAnimationFrame for smoother animation
   const updateCounter = (timestamp) => {
     if (!isRunning.value) return;
     
     const elapsed = timestamp - lastTimestamp;
     lastTimestamp = timestamp;
     
-    // 计算这段时间内赚取的金额
+    // Calculate amount earned during this time period
     const earned = (secondRate.value * elapsed) / 1000;
     earnedAmount.value += earned;
     
@@ -271,7 +271,7 @@ const startCounter = () => {
   animationFrame = requestAnimationFrame(updateCounter);
 };
 
-// 停止计数器
+// Stop counter
 const stopCounter = () => {
   isRunning.value = false;
   if (animationFrame) {
@@ -280,15 +280,15 @@ const stopCounter = () => {
   }
 };
 
-// 重置收益
+// Reset earnings
 const resetEarnings = () => {
   stopCounter();
   earnedAmount.value = 0;
 };
 
-// 组件挂载时
+// When component is mounted
 onMounted(() => {
-  // 从本地存储加载设置
+  // Load settings from local storage
   const savedMonthlySalary = localStorage.getItem('monthlySalary');
   const savedWorkingDays = localStorage.getItem('workingDays');
   const savedWorkingHours = localStorage.getItem('workingHours');
@@ -304,14 +304,14 @@ onMounted(() => {
   calculateSalary();
 });
 
-// 组件卸载前
+// Before component is unmounted
 onBeforeUnmount(() => {
   stopCounter();
 });
 </script>
 
 <style>
-/* 全局样式，不使用scoped，确保工具提示样式生效 */
+/* Global styles, not scoped, to ensure tooltip styles work */
 .tooltip-rates {
   display: flex;
   flex-direction: column;
@@ -335,7 +335,7 @@ onBeforeUnmount(() => {
   color: #ffffff;
 }
 
-/* 确保Element Plus的工具提示允许HTML内容 */
+/* Ensure Element Plus tooltips allow HTML content */
 .el-tooltip__popper {
   max-width: none !important;
 }
@@ -359,7 +359,7 @@ onBeforeUnmount(() => {
   flex-direction: row;
   gap: 30px;
   margin-bottom: 20px;
-  min-height: 500px; /* 确保有足够的高度 */
+  min-height: 500px; /* ensure enough height */
 }
 
 .input-section {
@@ -444,7 +444,7 @@ onBeforeUnmount(() => {
   color: var(--el-text-color-primary);
 }
 
-/* 新的薪资率卡片样式 */
+/* New salary rate card styles */
 .rates-summary {
   margin-top: 20px;
 }
@@ -610,16 +610,16 @@ onBeforeUnmount(() => {
   font-size: 16px;
 }
 
-/* 移除响应式布局，保持水平布局 */
+/* Keep horizontal layout instead of responsive layout */
 @media (max-width: 768px) {
   .calculator-layout {
-    flex-direction: row; /* 保持水平布局 */
-    gap: 15px; /* 减小间距 */
+    flex-direction: row; /* maintain horizontal layout */
+    gap: 15px; /* reduce gap */
   }
   
   .input-section, 
   .visualization-section {
-    padding: 15px; /* 减小内边距 */
+    padding: 15px; /* reduce padding */
   }
   
   .water-circle {
@@ -651,7 +651,7 @@ onBeforeUnmount(() => {
   }
 }
 
-/* 超小屏幕适配 */
+/* Extra small screen adaptation */
 @media (max-width: 576px) {
   .calculator-layout {
     gap: 10px;

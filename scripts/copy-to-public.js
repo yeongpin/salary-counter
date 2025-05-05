@@ -1,19 +1,19 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-// 复制构建目录内容到 public 目录
+// Copy build directory contents to public directory
 async function copyBuildToPublic() {
   try {
     console.log('Current directory:', process.cwd());
     console.log('Script directory:', __dirname);
     
-    // 检查更多可能的构建输出路径
+    // Check multiple possible build output paths
     const possibleBuildDirs = [
       path.resolve(__dirname, '../dist'),
       path.resolve(__dirname, '../src/renderer/dist'),
       path.resolve(process.cwd(), 'dist'),
       path.resolve(process.cwd(), 'src/renderer/dist'),
-      // 添加更多可能的路径
+      // Add more possible paths
       path.resolve(__dirname, '../../dist'),
       path.resolve(__dirname, '../../../dist')
     ];
@@ -26,7 +26,7 @@ async function copyBuildToPublic() {
     
     let buildDir = null;
     
-    // 找到实际存在的构建目录
+    // Find the actual build directory that exists
     for (const dir of possibleBuildDirs) {
       if (fs.existsSync(dir)) {
         buildDir = dir;
@@ -35,14 +35,14 @@ async function copyBuildToPublic() {
     }
     
     if (!buildDir) {
-      // 如果找不到构建目录，我们可以尝试直接复制 public 中的资源文件
+      // If build directory not found, try to directly copy resources from public
       console.log('Build directory not found. Checking if public directory already has assets...');
       const publicDir = path.resolve(__dirname, '../public');
       const publicAssetsDir = path.resolve(publicDir, 'assets');
       
       if (fs.existsSync(publicAssetsDir)) {
         console.log('Public assets directory exists. No need to copy files.');
-        // 即使不需要复制构建文件，我们仍然需要复制 logo.png
+        // Even if we don't need to copy build files, we still need to copy logo.png
         await copyLogoFile();
         return;
       }
@@ -52,10 +52,10 @@ async function copyBuildToPublic() {
     
     const publicDir = path.resolve(__dirname, '../public');
     
-    // 确保目录存在
+    // Ensure directory exists
     await fs.ensureDir(publicDir);
     
-    // 复制文件
+    // Copy files
     console.log(`Copying files from ${buildDir} to ${publicDir}...`);
     await fs.copy(buildDir, publicDir, {
       overwrite: true
@@ -63,12 +63,12 @@ async function copyBuildToPublic() {
     
     console.log(`Successfully copied build files from ${buildDir} to public directory`);
     
-    // 复制 logo.png 文件
+    // Copy logo.png file
     await copyLogoFile();
     
   } catch (err) {
     console.error('Error copying files:', err);
-    // 列出当前目录内容，帮助调试
+    // List current directory contents to help with debugging
     try {
       const currentDirContents = fs.readdirSync(process.cwd());
       console.log('Current directory contents:', currentDirContents);
@@ -88,54 +88,54 @@ async function copyBuildToPublic() {
   }
 }
 
-// 复制 logo.png 文件的函数
+// Function to copy logo.png file
 async function copyLogoFile() {
   try {
     const publicImageDir = path.resolve(__dirname, '../public/image');
     
-    // 确保 public/image 目录存在
+    // Ensure public/image directory exists
     await fs.ensureDir(publicImageDir);
     
     console.log('Searching for logo file...');
     
-    // 可能的 logo.png 源文件位置 (添加更多可能的文件名和路径)
+    // Possible logo.png source file locations (adding more possible filenames and paths)
     const possibleLogoPaths = [
-      // 使用原始文件名 @logo.png
+      // Using original filename @logo.png
       path.resolve(__dirname, '../src/renderer/@logo.png'),
       path.resolve(__dirname, '../src/@logo.png'),
       path.resolve(__dirname, '../@logo.png'),
       path.resolve(process.cwd(), '@logo.png'),
       path.resolve(process.cwd(), 'src/renderer/@logo.png'),
       
-      // 使用 logo.png 文件名
+      // Using logo.png filename
       path.resolve(__dirname, '../src/renderer/logo.png'),
       path.resolve(__dirname, '../src/logo.png'),
       path.resolve(__dirname, '../logo.png'),
       path.resolve(process.cwd(), 'logo.png'),
       path.resolve(process.cwd(), 'src/renderer/logo.png'),
       
-      // 检查 assets 目录
+      // Check assets directory
       path.resolve(__dirname, '../src/renderer/assets/@logo.png'),
       path.resolve(__dirname, '../src/assets/@logo.png'),
       path.resolve(__dirname, '../assets/@logo.png'),
       path.resolve(process.cwd(), 'assets/@logo.png'),
       path.resolve(process.cwd(), 'src/renderer/assets/@logo.png'),
       
-      // 检查 image 目录
+      // Check image directory
       path.resolve(__dirname, '../src/renderer/image/@logo.png'),
       path.resolve(__dirname, '../src/image/@logo.png'),
       path.resolve(__dirname, '../image/@logo.png'),
       path.resolve(process.cwd(), 'image/@logo.png'),
       path.resolve(process.cwd(), 'src/renderer/image/@logo.png'),
       
-      // 检查 icon.png
+      // Check icon.png
       path.resolve(__dirname, '../src/renderer/icon.png'),
       path.resolve(__dirname, '../src/icon.png'),
       path.resolve(__dirname, '../icon.png'),
       path.resolve(process.cwd(), 'icon.png'),
       path.resolve(process.cwd(), 'src/renderer/icon.png'),
       
-      // 检查 image 目录中的 icon.png
+      // Check image directory for icon.png
       path.resolve(__dirname, '../src/renderer/image/icon.png'),
       path.resolve(__dirname, '../src/image/icon.png'),
       path.resolve(__dirname, '../image/icon.png'),
@@ -143,7 +143,7 @@ async function copyLogoFile() {
       path.resolve(process.cwd(), 'src/renderer/image/icon.png')
     ];
     
-    // 查找存在的 logo 文件
+    // Find existing logo file
     let logoPath = null;
     for (const p of possibleLogoPaths) {
       if (fs.existsSync(p)) {
@@ -154,14 +154,14 @@ async function copyLogoFile() {
     }
     
     if (logoPath) {
-      // 复制 logo 文件到 public/image 目录
+      // Copy logo file to public/image directory
       const destLogoPath = path.resolve(publicImageDir, 'icon.png');
       await fs.copy(logoPath, destLogoPath);
       console.log(`Successfully copied logo from ${logoPath} to ${destLogoPath}`);
     } else {
       console.warn('Warning: Logo file not found in any of the expected locations');
       
-      // 列出当前目录和一些关键目录的内容，帮助找到 logo 文件
+      // List contents of current directory and some key directories to help find the logo file
       console.log('Listing directories to help locate the logo file:');
       
       const dirsToCheck = [
@@ -182,7 +182,7 @@ async function copyLogoFile() {
             const files = fs.readdirSync(dir);
             console.log(`Contents of ${dir}:`, files);
             
-            // 查找可能的 logo 文件
+            // Find potential logo files
             const logoFiles = files.filter(file => 
               file.includes('logo') || 
               file.includes('icon') || 
@@ -192,7 +192,7 @@ async function copyLogoFile() {
             if (logoFiles.length > 0) {
               console.log(`Potential logo files in ${dir}:`, logoFiles);
               
-              // 尝试复制第一个找到的可能的 logo 文件
+              // Try to copy the first potential logo file found
               const firstLogoFile = path.join(dir, logoFiles[0]);
               const destLogoPath = path.resolve(publicImageDir, 'icon.png');
               await fs.copy(firstLogoFile, destLogoPath);
