@@ -7,11 +7,13 @@
     "scripts": {
         "dev": "vite",
         "clean": "node scripts/clean-dist.js",
-        "build": "npm run clean && vite build",
+        "build": "npm run clean && echo 'Starting build...' && vite build --debug",
         "postbuild": "node scripts/copy-to-public.js",
         "serve": "node app.js",
         "start": "npm run build && npm run serve",
-        "manual-copy": "node scripts/manual-copy.js"
+        "manual-copy": "node scripts/manual-copy.js",
+        "find-build": "node scripts/find-latest-build.js",
+        "build-fresh": "npm run clean && rm -rf node_modules/.vite && vite build --force && node scripts/copy-to-public.js"
     },
     "dependencies": {
         "@element-plus/icons-vue": "^2.3.1",

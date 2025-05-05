@@ -26,7 +26,10 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        format: 'cjs'
+        format: 'cjs',
+        entryFileNames: `assets/[name]-[hash]-${new Date().getTime()}.js`,
+        chunkFileNames: `assets/[name]-[hash]-${new Date().getTime()}.js`,
+        assetFileNames: `assets/[name]-[hash]-${new Date().getTime()}.[ext]`
       }
     }
   }

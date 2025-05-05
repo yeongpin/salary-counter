@@ -57,6 +57,10 @@ async function copyBuildToPublic() {
     
     // Copy files
     console.log(`Copying files from ${buildDir} to ${publicDir}...`);
+    console.log('Build timestamp:', new Date().toISOString());
+    console.log('Files in build directory:');
+    const buildFiles = fs.readdirSync(buildDir);
+    console.log(buildFiles);
     await fs.copy(buildDir, publicDir, {
       overwrite: true
     });
