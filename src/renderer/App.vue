@@ -2,6 +2,14 @@
   <div class="app-container" :class="{ 'dark-mode': isDarkMode }">
     <!-- Sidebar -->
     <div class="sidebar" :class="{ 'sidebar-expanded': sidebarExpanded }">
+          <!-- GitHub button - NEW -->
+          <div class="sidebar-toggle" @click="openGithub">
+            <el-icon>
+              <svg width="800" height="800" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.976 0A7.977 7.977 0 0 0 0 7.976c0 3.522 2.3 6.507 5.431 7.584.392.049.538-.196.538-.392v-1.37c-2.201.49-2.69-1.076-2.69-1.076-.343-.93-.881-1.175-.881-1.175-.734-.489.048-.489.048-.489.783.049 1.224.832 1.224.832.734 1.223 1.859.88 2.3.685.048-.538.293-.88.489-1.076-1.762-.196-3.621-.881-3.621-3.964 0-.88.293-1.566.832-2.153-.05-.147-.343-.978.098-2.055 0 0 .685-.196 2.201.832.636-.196 1.322-.245 2.007-.245s1.37.098 2.006.245c1.517-1.027 2.202-.832 2.202-.832.44 1.077.146 1.908.097 2.104a3.16 3.16 0 0 1 .832 2.153c0 3.083-1.86 3.719-3.62 3.915.293.244.538.733.538 1.467v2.202c0 .196.146.44.538.392A7.98 7.98 0 0 0 16 7.976C15.951 3.572 12.38 0 7.976 0"/>
+              </svg>
+            </el-icon>
+          </div>
       <div class="sidebar-toggle" @click="toggleSidebar">
         <el-icon><Setting /></el-icon>
       </div>
@@ -301,6 +309,11 @@ const resetEarnings = () => {
   localStorage.setItem('earnedAmount', 0);
 };
 
+// Open GitHub repository
+const openGithub = () => {
+  window.open('https://github.com/yeongpin/salary-counter', '_blank');
+};
+
 // When component mounts
 onMounted(() => {
   // Check language setting in local storage
@@ -392,6 +405,9 @@ onBeforeUnmount(() => {
   position: fixed;
   left: 20px;
   bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* 按鈕間距 */
   z-index: 100;
   transition: all 0.3s ease;
 }
@@ -431,6 +447,7 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   max-height: 80vh;
   color: var(--text-color);
+  z-index: 1000;
 }
 
 /* Custom scrollbar */
