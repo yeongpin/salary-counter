@@ -27,7 +27,8 @@
     "darkMode": "深色",
     "lightMode": "淺色",
     "advanced": "高級設置",
-    "decimalPlaces": "小數位數"
+    "decimalPlaces": "小數位數",
+    "rainColor": "雨滴顏色"
   },
   "button": {
     "calculate": "計算",
@@ -48,5 +49,16 @@
     "message": "您想要退出還是最小化應用程式？",
     "minimize": "最小化",
     "exit": "退出"
+  },
+  "rainSettings": {
+    "title": "貨幣雨設置",
+    "enabled": "啟用貨幣雨",
+    "color": "顏色",
+    "speed": "速度",
+    "size": "大小",
+    "density": "密度",
+    "random": "隨機",
+    "reset": "重置",
+    "autoStart": "自動啟動"
   }
 } 

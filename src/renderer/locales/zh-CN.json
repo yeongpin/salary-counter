@@ -27,7 +27,8 @@
     "darkMode": "深色",
     "lightMode": "浅色",
     "advanced": "高级设置",
-    "decimalPlaces": "小数位数"
+    "decimalPlaces": "小数位数",
+    "rainColor": "雨滴颜色"
   },
   "button": {
     "calculate": "计算",
@@ -48,5 +49,16 @@
     "message": "您想要退出还是最小化应用程序？",
     "minimize": "最小化",
     "exit": "退出"
+  },
+  "rainSettings": {
+    "title": "货币雨设置",
+    "enabled": "启用货币雨",
+    "color": "颜色",
+    "speed": "速度",
+    "size": "大小",
+    "density": "密度",
+    "random": "随机",
+    "reset": "重置",
+    "autoStart": "自动启动"
   }
 } 

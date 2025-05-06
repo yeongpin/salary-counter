@@ -1,20 +1,33 @@
 <template>
-  <div class="app-container" :class="{ 'dark-mode': isDarkMode }">
+  <div class="app-container" :class="{ 'dark-mode': isDarkMode }" @click="handleOutsideClick">
     <!-- Sidebar -->
-    <div class="sidebar" :class="{ 'sidebar-expanded': sidebarExpanded }">
-          <!-- GitHub button - NEW -->
-          <div class="sidebar-toggle" @click="openGithub">
-            <el-icon>
-              <svg width="800" height="800" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M7.976 0A7.977 7.977 0 0 0 0 7.976c0 3.522 2.3 6.507 5.431 7.584.392.049.538-.196.538-.392v-1.37c-2.201.49-2.69-1.076-2.69-1.076-.343-.93-.881-1.175-.881-1.175-.734-.489.048-.489.048-.489.783.049 1.224.832 1.224.832.734 1.223 1.859.88 2.3.685.048-.538.293-.88.489-1.076-1.762-.196-3.621-.881-3.621-3.964 0-.88.293-1.566.832-2.153-.05-.147-.343-.978.098-2.055 0 0 .685-.196 2.201.832.636-.196 1.322-.245 2.007-.245s1.37.098 2.006.245c1.517-1.027 2.202-.832 2.202-.832.44 1.077.146 1.908.097 2.104a3.16 3.16 0 0 1 .832 2.153c0 3.083-1.86 3.719-3.62 3.915.293.244.538.733.538 1.467v2.202c0 .196.146.44.538.392A7.98 7.98 0 0 0 16 7.976C15.951 3.572 12.38 0 7.976 0"/>
-              </svg>
-            </el-icon>
-          </div>
-      <div class="sidebar-toggle" @click="toggleSidebar">
+    <div class="sidebar" :class="{ 'sidebar-expanded': sidebarExpanded || rainSettingsExpanded }">
+      <!-- GitHub button -->
+      <div class="sidebar-toggle" @click.stop="openGithub">
+        <el-icon>
+          <svg width="800" height="800" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M7.976 0A7.977 7.977 0 0 0 0 7.976c0 3.522 2.3 6.507 5.431 7.584.392.049.538-.196.538-.392v-1.37c-2.201.49-2.69-1.076-2.69-1.076-.343-.93-.881-1.175-.881-1.175-.734-.489.048-.489.048-.489.783.049 1.224.832 1.224.832.734 1.223 1.859.88 2.3.685.048-.538.293-.88.489-1.076-1.762-.196-3.621-.881-3.621-3.964 0-.88.293-1.566.832-2.153-.05-.147-.343-.978.098-2.055 0 0 .685-.196 2.201.832.636-.196 1.322-.245 2.007-.245s1.37.098 2.006.245c1.517-1.027 2.202-.832 2.202-.832.44 1.077.146 1.908.097 2.104a3.16 3.16 0 0 1 .832 2.153c0 3.083-1.86 3.719-3.62 3.915.293.244.538.733.538 1.467v2.202c0 .196.146.44.538.392A7.98 7.98 0 0 0 16 7.976C15.951 3.572 12.38 0 7.976 0"/>
+          </svg>
+        </el-icon>
+      </div>
+      
+      <!-- Currency Rain Settings button -->
+      <div class="sidebar-toggle" @click.stop="toggleRainSettings">
+        <el-icon>
+          <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 12v-2h-4V7h-2v3h-2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h6v3h-8v2h4v3h2v-3h2a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-6v-3Z"/>
+            <path d="M16 4A12 12 0 1 1 4 16 12.035 12.035 0 0 1 16 4m0-2a14 14 0 1 0 14 14A14.04 14.04 0 0 0 16 2"/>
+          </svg>
+        </el-icon>
+      </div>
+      
+      <!-- Settings button -->
+      <div class="sidebar-toggle" @click.stop="toggleSidebar">
         <el-icon><Setting /></el-icon>
       </div>
       
-      <div class="sidebar-content" v-show="sidebarExpanded">
+      <!-- Main settings panel -->
+      <div class="sidebar-content" v-show="sidebarExpanded" @click.stop>
         <h3 class="sidebar-title">{{ t('settings.title') }}</h3>
         
         <div class="setting-group">
@@ -110,6 +123,92 @@
           </div>
         </div>
       </div>
+      
+      <!-- Currency Rain Settings Panel -->
+      <div class="sidebar-content rain-settings" v-show="rainSettingsExpanded" @click.stop>
+        <div class="sidebar-header">
+          <h3 class="sidebar-title">{{ t('rainSettings.title') }}</h3>
+          <el-button 
+            class="reset-rain-button" 
+            type="primary" 
+            circle 
+            @click="resetRainSettings"
+            title="Reset to defaults"
+          >
+            <el-icon><Refresh /></el-icon>
+          </el-button>
+        </div>
+        
+        <div class="setting-group">
+          <label>{{ t('rainSettings.enabled') }}</label>
+          <el-switch
+            v-model="rainEnabled"
+            @change="toggleRainEnabled"
+          />
+        </div>
+        
+        <div class="setting-group" :class="{ 'disabled': !rainEnabled }">
+          <label>{{ t('rainSettings.color') }}</label>
+          <div class="setting-row">
+            <el-color-picker
+              v-model="rainColor"
+              show-alpha
+              @change="changeRainColor"
+              :disabled="randomColor || !rainEnabled"
+            />
+            <div class="random-option">
+              <el-checkbox v-model="randomColor" @change="toggleRandomColor" :disabled="!rainEnabled">
+                {{ t('rainSettings.random') }}
+              </el-checkbox>
+            </div>
+          </div>
+        </div>
+        
+        <div class="setting-group" :class="{ 'disabled': !rainEnabled }">
+          <label>{{ t('rainSettings.speed') }}</label>
+          <el-slider
+            v-model="rainSpeed"
+            :min="0.5"
+            :max="3"
+            :step="0.1"
+            @change="changeRainSpeed"
+            :disabled="!rainEnabled"
+          />
+        </div>
+        
+        <div class="setting-group" :class="{ 'disabled': !rainEnabled }">
+          <label>{{ t('rainSettings.size') }}</label>
+          <el-slider
+            v-model="rainSize"
+            :min="0.5"
+            :max="2"
+            :step="0.1"
+            @change="changeRainSize"
+            :disabled="!rainEnabled"
+          />
+        </div>
+        
+        <div class="setting-group" :class="{ 'disabled': !rainEnabled }">
+          <label>{{ t('rainSettings.density') }}</label>
+          <el-slider
+            v-model="rainDensity"
+            :min="10"
+            :max="200"
+            :step="10"
+            @change="changeRainDensity"
+            :disabled="!rainEnabled"
+          />
+        </div>
+        
+        <div class="setting-group" :class="{ 'disabled': !rainEnabled }">
+          <label>{{ t('rainSettings.autoStart') }}</label>
+          <el-switch
+            v-model="autoStartRain"
+            @change="toggleAutoStartRain"
+            :disabled="!rainEnabled"
+          />
+        </div>
+      </div>
     </div>
     
     <!-- Main content area -->
@@ -165,7 +264,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { Setting } from '@element-plus/icons-vue';
+import { Setting, Refresh } from '@element-plus/icons-vue';
 
 const { t, locale } = useI18n();
 const currentLocale = ref(locale.value);
@@ -182,6 +281,16 @@ const isDarkMode = ref(localStorage.getItem('darkMode') !== 'false');
 let countInterval = null;
 let animationFrame = null;
 let lastTimestamp = null;
+
+// 货币雨设置
+const rainSettingsExpanded = ref(false);
+const rainColor = ref(localStorage.getItem('rainColor') || '#85bb65');
+const rainSpeed = ref(Number(localStorage.getItem('rainSpeed')) || 1);
+const rainSize = ref(Number(localStorage.getItem('rainSize')) || 1);
+const rainDensity = ref(Number(localStorage.getItem('rainDensity')) || 100);
+const randomColor = ref(localStorage.getItem('randomColor') === 'true');
+const autoStartRain = ref(localStorage.getItem('autoStartRain') === 'true');
+const rainEnabled = ref(localStorage.getItem('rainEnabled') !== 'false'); // 默认启用
 
 // Switch language
 const changeLanguage = (lang) => {
@@ -256,6 +365,9 @@ const calculateSalary = () => {
 // Toggle sidebar
 const toggleSidebar = () => {
   sidebarExpanded.value = !sidebarExpanded.value;
+  if (sidebarExpanded.value) {
+    rainSettingsExpanded.value = false;
+  }
 };
 
 // Toggle counter
@@ -314,26 +426,169 @@ const openGithub = () => {
   window.open('https://github.com/yeongpin/salary-counter', '_blank');
 };
 
+// 切换货币雨设置面板
+const toggleRainSettings = () => {
+  rainSettingsExpanded.value = !rainSettingsExpanded.value;
+  if (rainSettingsExpanded.value) {
+    sidebarExpanded.value = false;
+  }
+};
+
+// 更改货币雨颜色
+const changeRainColor = (color) => {
+  localStorage.setItem('rainColor', color);
+  if (window.currencyRain) {
+    window.currencyRain.setColor(color);
+  } else {
+    window.postMessage({ type: 'setColor', data: color }, '*');
+  }
+};
+
+// 更改货币雨速度
+const changeRainSpeed = (speed) => {
+  localStorage.setItem('rainSpeed', speed);
+  if (window.currencyRain) {
+    window.currencyRain.setSpeed(speed);
+  } else {
+    window.postMessage({ type: 'setSpeed', data: speed }, '*');
+  }
+};
+
+// 更改货币雨大小
+const changeRainSize = (size) => {
+  localStorage.setItem('rainSize', size);
+  if (window.currencyRain) {
+    window.currencyRain.setSize(size);
+  } else {
+    window.postMessage({ type: 'setSize', data: size }, '*');
+  }
+};
+
+// 更改货币雨密度
+const changeRainDensity = (density) => {
+  localStorage.setItem('rainDensity', density);
+  if (window.currencyRain) {
+    window.currencyRain.setDensity(density);
+  } else {
+    window.postMessage({ type: 'setDensity', data: density }, '*');
+  }
+};
+
+// 切换随机颜色
+const toggleRandomColor = (value) => {
+  localStorage.setItem('randomColor', value);
+  if (window.currencyRain) {
+    window.currencyRain.setRandomColor(value);
+  } else {
+    window.postMessage({ type: 'setRandomColor', data: value }, '*');
+  }
+};
+
+// 切换自动启动
+const toggleAutoStartRain = (value) => {
+  localStorage.setItem('autoStartRain', value);
+};
+
+// 切换货币雨启用状态
+const toggleRainEnabled = (value) => {
+  localStorage.setItem('rainEnabled', value);
+  
+  if (window.currencyRain) {
+    window.currencyRain.setEnabled(value);
+  } else {
+    window.postMessage({ type: 'setEnabled', data: value }, '*');
+  }
+  
+  // 如果禁用，停止雨滴
+  if (!value) {
+    if (window.currencyRain) {
+      window.currencyRain.setRunning(false);
+    } else {
+      window.postMessage({ type: 'setRunning', data: false }, '*');
+    }
+  } else if (isRunning.value || autoStartRain.value) {
+    // 如果启用，且计时器正在运行或设置了自动启动，则开始雨滴
+    if (window.currencyRain) {
+      window.currencyRain.setRunning(true);
+    } else {
+      window.postMessage({ type: 'setRunning', data: true }, '*');
+    }
+  }
+};
+
+// 重置货币雨设置
+const resetRainSettings = () => {
+  rainColor.value = '#85bb65';
+  rainSpeed.value = 1;
+  rainSize.value = 1;
+  rainDensity.value = 100;
+  randomColor.value = false;
+  autoStartRain.value = false;
+  rainEnabled.value = true;
+  
+  // 保存到本地存储
+  localStorage.setItem('rainColor', rainColor.value);
+  localStorage.setItem('rainSpeed', rainSpeed.value);
+  localStorage.setItem('rainSize', rainSize.value);
+  localStorage.setItem('rainDensity', rainDensity.value);
+  localStorage.setItem('randomColor', randomColor.value);
+  localStorage.setItem('autoStartRain', autoStartRain.value);
+  localStorage.setItem('rainEnabled', rainEnabled.value);
+  
+  // 更新货币雨效果
+  if (window.currencyRain) {
+    window.currencyRain.resetSettings();
+  } else {
+    window.postMessage({ type: 'resetSettings', data: null }, '*');
+  }
+};
+
+// 监听货币变化
+watch(() => currency.value, (newCurrency) => {
+  if (window.currencyRain) {
+    window.currencyRain.setCurrency(newCurrency);
+  } else {
+    window.postMessage({ type: 'setCurrency', data: newCurrency }, '*');
+  }
+});
+
+// 监听运行状态变化
+watch(() => isRunning.value, (newRunning) => {
+  if (window.currencyRain) {
+    window.currencyRain.setRunning(newRunning);
+  } else {
+    window.postMessage({ type: 'setRunning', data: newRunning }, '*');
+  }
+});
+
+// 监听主题变化
+watch(() => isDarkMode.value, (isDark) => {
+  // 只有在用户没有自定义颜色时才根据主题设置颜色
+  if (rainColor.value === '#85bb65' || rainColor.value === '#53fc53') {
+    const color = isDark ? '#85bb65' : '#53fc53';
+    rainColor.value = color;
+    if (window.currencyRain) {
+      window.currencyRain.setColor(color);
+    } else {
+      window.postMessage({ type: 'setColor', data: color }, '*');
+    }
+  }
+});
+
+// 处理点击外部区域
+const handleOutsideClick = () => {
+  if (sidebarExpanded.value) {
+    sidebarExpanded.value = false;
+  }
+  if (rainSettingsExpanded.value) {
+    rainSettingsExpanded.value = false;
+  }
+};
+
 // When component mounts
 onMounted(() => {
-  // Check language setting in local storage
-  const savedLanguage = localStorage.getItem('language');
-  if (savedLanguage) {
-    locale.value = savedLanguage;
-    currentLocale.value = savedLanguage;
-  }
-  
-  // Check theme setting in local storage
-  // If not set, default to dark mode
-  const savedTheme = localStorage.getItem('darkMode');
-  if (savedTheme === null) {
-    localStorage.setItem('darkMode', 'true');
-    isDarkMode.value = true;
-  } else {
-    isDarkMode.value = savedTheme !== 'false';
-  }
-  
   // Load settings from local storage
+  const savedLocale = localStorage.getItem('language');
   const savedMonthlySalary = localStorage.getItem('monthlySalary');
   const savedWorkingDays = localStorage.getItem('workingDays');
   const savedWorkingHours = localStorage.getItem('workingHours');
@@ -341,12 +596,72 @@ onMounted(() => {
   const savedDecimalPlaces = localStorage.getItem('decimalPlaces');
   const savedEarnedAmount = localStorage.getItem('earnedAmount');
   
+  if (savedLocale) {
+    currentLocale.value = savedLocale;
+    locale.value = savedLocale;
+  }
+  
   if (savedMonthlySalary) monthlySalary.value = Number(savedMonthlySalary);
   if (savedWorkingDays) workingDays.value = Number(savedWorkingDays);
   if (savedWorkingHours) workingHours.value = Number(savedWorkingHours);
   if (savedCurrency) currency.value = savedCurrency;
   if (savedDecimalPlaces) decimalPlaces.value = Number(savedDecimalPlaces);
   if (savedEarnedAmount) earnedAmount.value = Number(savedEarnedAmount);
+  
+  // Apply dark mode
+  document.documentElement.classList.toggle('dark-theme', isDarkMode.value);
+  
+  // 加载货币雨设置
+  const savedRainColor = localStorage.getItem('rainColor');
+  const savedRainSpeed = localStorage.getItem('rainSpeed');
+  const savedRainSize = localStorage.getItem('rainSize');
+  const savedRainDensity = localStorage.getItem('rainDensity');
+  const savedRandomColor = localStorage.getItem('randomColor');
+  const savedAutoStartRain = localStorage.getItem('autoStartRain');
+  const savedRainEnabled = localStorage.getItem('rainEnabled');
+  
+  if (savedRainColor) rainColor.value = savedRainColor;
+  if (savedRainSpeed) rainSpeed.value = Number(savedRainSpeed);
+  if (savedRainSize) rainSize.value = Number(savedRainSize);
+  if (savedRainDensity) rainDensity.value = Number(savedRainDensity);
+  if (savedRandomColor) randomColor.value = savedRandomColor === 'true';
+  if (savedAutoStartRain) autoStartRain.value = savedAutoStartRain === 'true';
+  if (savedRainEnabled !== null) rainEnabled.value = savedRainEnabled !== 'false';
+  
+  // 初始化货币雨设置
+  setTimeout(() => {
+    if (window.currencyRain) {
+      window.currencyRain.setCurrency(currency.value);
+      window.currencyRain.setColor(rainColor.value);
+      window.currencyRain.setSpeed(rainSpeed.value);
+      window.currencyRain.setSize(rainSize.value);
+      window.currencyRain.setDensity(rainDensity.value);
+      window.currencyRain.setRandomColor(randomColor.value);
+      window.currencyRain.setEnabled(rainEnabled.value);
+      
+      // 如果启用了货币雨且设置了自动启动，则启动货币雨
+      if (rainEnabled.value && autoStartRain.value) {
+        window.currencyRain.setRunning(true);
+      } else {
+        window.currencyRain.setRunning(isRunning.value && rainEnabled.value);
+      }
+    } else {
+      window.postMessage({ type: 'setCurrency', data: currency.value }, '*');
+      window.postMessage({ type: 'setColor', data: rainColor.value }, '*');
+      window.postMessage({ type: 'setSpeed', data: rainSpeed.value }, '*');
+      window.postMessage({ type: 'setSize', data: rainSize.value }, '*');
+      window.postMessage({ type: 'setDensity', data: rainDensity.value }, '*');
+      window.postMessage({ type: 'setRandomColor', data: randomColor.value }, '*');
+      window.postMessage({ type: 'setEnabled', data: rainEnabled.value }, '*');
+      
+      // 如果启用了货币雨且设置了自动启动，则启动货币雨
+      if (rainEnabled.value && autoStartRain.value) {
+        window.postMessage({ type: 'setRunning', data: true }, '*');
+      } else {
+        window.postMessage({ type: 'setRunning', data: isRunning.value && rainEnabled.value }, '*');
+      }
+    }
+  }, 500);
 });
 
 // Before component unmounts
@@ -481,7 +796,7 @@ onBeforeUnmount(() => {
 
 .setting-group label {
   display: block;
-  margin-bottom: 8px;
+  align-content: center;
   font-weight: 500;
   color: var(--text-color);
 }
@@ -848,5 +1163,55 @@ onBeforeUnmount(() => {
     height: 44px;
     font-size: 16px;
   }
+}
+
+/* 货币雨设置面板样式 */
+.rain-settings {
+  max-width: 300px;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 var(--shadow-color);
+}
+
+/* 货币雨图标样式 */
+.sidebar-toggle svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* 设置面板标题栏 */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* 重置按钮 */
+.reset-rain-button {
+  font-size: 14px;
+  padding: 6px;
+}
+
+/* 设置行样式 */
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+/* 随机选项样式 */
+.random-option {
+  white-space: nowrap;
+}
+
+/* 禁用状态样式 */
+.setting-group.disabled {
+  opacity: 0.6;
 }
 </style> 

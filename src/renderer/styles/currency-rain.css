@@ -1,0 +1,60 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+	
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	
+	overflow: hidden;
+	min-height: 100vh;
+	font-family: 'Nanum Gothic', sans-serif;
+	margin: 0;
+}
+
+h1 {
+	color: #85bb65;
+	text-shadow: 1px 1px 3px #000;
+	font-size: 60px;
+	position: relative;
+	z-index: 2;
+}
+
+.dollar-container {
+	animation: fall 2s linear;
+	/* 颜色现在通过 JavaScript 动态设置 */
+	text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+	top: -100px;
+	position: absolute;
+}
+
+@keyframes fall {
+	to {
+		transform: translateY(110vh);
+	}
+}
+
+.fa-dollar-sign,
+.fa-euro-sign,
+.fa-pound-sign,
+.fa-yen-sign {
+	animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+	to {
+		transform: rotate(359deg);
+	}
+}
+
+/* 深色模式适配 */
+body.dark-theme .dollar-container {
+	/* 颜色现在通过 JavaScript 动态设置 */
+	transition: color 0.3s ease;
+}
+
+/* 深色模式适配通过 JavaScript 动态设置颜色 */

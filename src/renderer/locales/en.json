@@ -27,7 +27,8 @@
     "darkMode": "Dark",
     "lightMode": "Light",
     "advanced": "Advanced Settings",
-    "decimalPlaces": "Decimal Places"
+    "decimalPlaces": "Decimal Places",
+    "rainColor": "Rain Color"
   },
   "button": {
     "calculate": "Calculate",
@@ -48,5 +49,16 @@
     "message": "Do you want to exit or minimize the application?",
     "minimize": "Minimize",
     "exit": "Exit"
+  },
+  "rainSettings": {
+    "title": "Currency Rain Settings",
+    "enabled": "Enable Rain",
+    "color": "Color",
+    "speed": "Speed",
+    "size": "Size",
+    "density": "Density",
+    "random": "Random",
+    "reset": "Reset",
+    "autoStart": "Auto Start"
   }
 } 

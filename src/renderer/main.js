@@ -7,6 +7,7 @@ import enMessages from './locales/en.json'
 import zhTWMessages from './locales/zh-TW.json'
 import zhCNMessages from './locales/zh-CN.json'
 import './styles/main.css'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 // Create i18n instance
 const i18n = createI18n({
