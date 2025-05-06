@@ -276,13 +276,13 @@ const earnedAmount = ref(0);
 const isRunning = ref(false);
 const currency = ref('USD');
 const decimalPlaces = ref(2);
-// Default to dark mode, unless explicitly set to light mode in local storage
+// default to dark mode, unless explicitly set to light mode in local storage
 const isDarkMode = ref(localStorage.getItem('darkMode') !== 'false');
 let countInterval = null;
 let animationFrame = null;
 let lastTimestamp = null;
 
-// 货币雨设置
+// currency rain settings
 const rainSettingsExpanded = ref(false);
 const rainColor = ref(localStorage.getItem('rainColor') || '#85bb65');
 const rainSpeed = ref(Number(localStorage.getItem('rainSpeed')) || 1);
@@ -290,7 +290,7 @@ const rainSize = ref(Number(localStorage.getItem('rainSize')) || 1);
 const rainDensity = ref(Number(localStorage.getItem('rainDensity')) || 100);
 const randomColor = ref(localStorage.getItem('randomColor') === 'true');
 const autoStartRain = ref(localStorage.getItem('autoStartRain') === 'true');
-const rainEnabled = ref(localStorage.getItem('rainEnabled') !== 'false'); // 默认启用
+const rainEnabled = ref(localStorage.getItem('rainEnabled') !== 'false'); // default enabled
 
 // Switch language
 const changeLanguage = (lang) => {
@@ -323,7 +323,7 @@ const secondRate = computed(() => {
 
 // Calculate water wave fill percentage
 const fillPercentage = computed(() => {
-  // 使用日薪作为最大值，这样需要工作一整天才能填满
+  // use daily rate as max value, so it takes a whole day to fill
   const maxValue = dailyRate.value;
   return Math.min(earnedAmount.value / maxValue * 100, 100);
 });
@@ -354,7 +354,7 @@ const formatCurrency = (value, isEarned = false, forTooltip = false) => {
 
 // Calculate salary
 const calculateSalary = () => {
-  // Save settings to local storage
+  // save settings to local storage
   localStorage.setItem('monthlySalary', monthlySalary.value);
   localStorage.setItem('workingDays', workingDays.value);
   localStorage.setItem('workingHours', workingHours.value);
@@ -426,7 +426,7 @@ const openGithub = () => {
   window.open('https://github.com/yeongpin/salary-counter', '_blank');
 };
 
-// 切换货币雨设置面板
+// toggle currency rain settings panel
 const toggleRainSettings = () => {
   rainSettingsExpanded.value = !rainSettingsExpanded.value;
   if (rainSettingsExpanded.value) {
@@ -434,7 +434,7 @@ const toggleRainSettings = () => {
   }
 };
 
-// 更改货币雨颜色
+// change currency rain color
 const changeRainColor = (color) => {
   localStorage.setItem('rainColor', color);
   if (window.currencyRain) {
@@ -444,7 +444,7 @@ const changeRainColor = (color) => {
   }
 };
 
-// 更改货币雨速度
+// change currency rain speed
 const changeRainSpeed = (speed) => {
   localStorage.setItem('rainSpeed', speed);
   if (window.currencyRain) {
@@ -454,7 +454,7 @@ const changeRainSpeed = (speed) => {
   }
 };
 
-// 更改货币雨大小
+// change currency rain size
 const changeRainSize = (size) => {
   localStorage.setItem('rainSize', size);
   if (window.currencyRain) {
@@ -464,7 +464,7 @@ const changeRainSize = (size) => {
   }
 };
 
-// 更改货币雨密度
+// change currency rain density
 const changeRainDensity = (density) => {
   localStorage.setItem('rainDensity', density);
   if (window.currencyRain) {
@@ -474,7 +474,7 @@ const changeRainDensity = (density) => {
   }
 };
 
-// 切换随机颜色
+// toggle random color
 const toggleRandomColor = (value) => {
   localStorage.setItem('randomColor', value);
   if (window.currencyRain) {
@@ -484,12 +484,12 @@ const toggleRandomColor = (value) => {
   }
 };
 
-// 切换自动启动
+// toggle auto start
 const toggleAutoStartRain = (value) => {
   localStorage.setItem('autoStartRain', value);
 };
 
-// 切换货币雨启用状态
+// toggle currency rain enabled
 const toggleRainEnabled = (value) => {
   localStorage.setItem('rainEnabled', value);
   
@@ -499,7 +499,7 @@ const toggleRainEnabled = (value) => {
     window.postMessage({ type: 'setEnabled', data: value }, '*');
   }
   
-  // 如果禁用，停止雨滴
+  // if disabled, stop rain
   if (!value) {
     if (window.currencyRain) {
       window.currencyRain.setRunning(false);
@@ -507,7 +507,7 @@ const toggleRainEnabled = (value) => {
       window.postMessage({ type: 'setRunning', data: false }, '*');
     }
   } else if (isRunning.value || autoStartRain.value) {
-    // 如果启用，且计时器正在运行或设置了自动启动，则开始雨滴
+    // if enabled, and counter is running or auto start is enabled, then start rain
     if (window.currencyRain) {
       window.currencyRain.setRunning(true);
     } else {
@@ -516,7 +516,7 @@ const toggleRainEnabled = (value) => {
   }
 };
 
-// 重置货币雨设置
+// reset currency rain settings
 const resetRainSettings = () => {
   rainColor.value = '#85bb65';
   rainSpeed.value = 1;
@@ -526,7 +526,7 @@ const resetRainSettings = () => {
   autoStartRain.value = false;
   rainEnabled.value = true;
   
-  // 保存到本地存储
+  // save to local storage
   localStorage.setItem('rainColor', rainColor.value);
   localStorage.setItem('rainSpeed', rainSpeed.value);
   localStorage.setItem('rainSize', rainSize.value);
@@ -535,7 +535,7 @@ const resetRainSettings = () => {
   localStorage.setItem('autoStartRain', autoStartRain.value);
   localStorage.setItem('rainEnabled', rainEnabled.value);
   
-  // 更新货币雨效果
+  // update currency rain effect
   if (window.currencyRain) {
     window.currencyRain.resetSettings();
   } else {
@@ -543,7 +543,7 @@ const resetRainSettings = () => {
   }
 };
 
-// 监听货币变化
+// listen to currency change
 watch(() => currency.value, (newCurrency) => {
   if (window.currencyRain) {
     window.currencyRain.setCurrency(newCurrency);
@@ -552,7 +552,7 @@ watch(() => currency.value, (newCurrency) => {
   }
 });
 
-// 监听运行状态变化
+// listen to running status change
 watch(() => isRunning.value, (newRunning) => {
   if (window.currencyRain) {
     window.currencyRain.setRunning(newRunning);
@@ -561,9 +561,9 @@ watch(() => isRunning.value, (newRunning) => {
   }
 });
 
-// 监听主题变化
+// listen to theme change
 watch(() => isDarkMode.value, (isDark) => {
-  // 只有在用户没有自定义颜色时才根据主题设置颜色
+  // only set color when user doesn't set custom color
   if (rainColor.value === '#85bb65' || rainColor.value === '#53fc53') {
     const color = isDark ? '#85bb65' : '#53fc53';
     rainColor.value = color;
@@ -575,7 +575,7 @@ watch(() => isDarkMode.value, (isDark) => {
   }
 });
 
-// 处理点击外部区域
+// handle click outside area
 const handleOutsideClick = () => {
   if (sidebarExpanded.value) {
     sidebarExpanded.value = false;
@@ -611,7 +611,7 @@ onMounted(() => {
   // Apply dark mode
   document.documentElement.classList.toggle('dark-theme', isDarkMode.value);
   
-  // 加载货币雨设置
+  // load currency rain settings
   const savedRainColor = localStorage.getItem('rainColor');
   const savedRainSpeed = localStorage.getItem('rainSpeed');
   const savedRainSize = localStorage.getItem('rainSize');
@@ -628,7 +628,7 @@ onMounted(() => {
   if (savedAutoStartRain) autoStartRain.value = savedAutoStartRain === 'true';
   if (savedRainEnabled !== null) rainEnabled.value = savedRainEnabled !== 'false';
   
-  // 初始化货币雨设置
+  // initialize currency rain settings
   setTimeout(() => {
     if (window.currencyRain) {
       window.currencyRain.setCurrency(currency.value);
@@ -639,7 +639,7 @@ onMounted(() => {
       window.currencyRain.setRandomColor(randomColor.value);
       window.currencyRain.setEnabled(rainEnabled.value);
       
-      // 如果启用了货币雨且设置了自动启动，则启动货币雨
+      // if enabled and auto start, then start rain
       if (rainEnabled.value && autoStartRain.value) {
         window.currencyRain.setRunning(true);
       } else {
@@ -654,7 +654,7 @@ onMounted(() => {
       window.postMessage({ type: 'setRandomColor', data: randomColor.value }, '*');
       window.postMessage({ type: 'setEnabled', data: rainEnabled.value }, '*');
       
-      // 如果启用了货币雨且设置了自动启动，则启动货币雨
+      // if enabled and auto start, then start rain
       if (rainEnabled.value && autoStartRain.value) {
         window.postMessage({ type: 'setRunning', data: true }, '*');
       } else {

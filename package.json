@@ -1,6 +1,6 @@
 {
     "name": "salary-calculator",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Real-time salary calculator application",
     "main": "app.js",
     "author": "yeongpin",

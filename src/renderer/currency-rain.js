@@ -1,18 +1,23 @@
-const app = document.getElementById('app');
-let currentCurrency = 'USD';
-let currentColor = '#85bb65'; // 默认绿色
-let isRunning = false;
-let rainSpeed = 1; // 默认速度
-let rainSize = 1; // 默认大小
-let rainDensity = 100; // 默认密度 (ms)
-let rainInterval = null;
-let isEnabled = true; // 默认启用
+const appContainer = document.getElementById('app');
+// create a dedicated container to place currency rain
+const rainContainer = document.createElement('DIV');
+rainContainer.classList.add('currency-rain-container');
+appContainer.appendChild(rainContainer);
 
-// 随机设置
+let currentCurrency = 'USD';
+let currentColor = '#85bb65'; // Default color
+let isRunning = false;
+let rainSpeed = 1; // Default speed
+let rainSize = 1; // Default size
+let rainDensity = 100; // Default density (ms)
+let rainInterval = null;
+let isEnabled = true; // Default enabled
+
+// random setting
 let randomColor = false;
 let randomColorInterval = null;
 
-// 获取货币符号对应的 Font Awesome 类名
+// get Font Awesome class name
 function getCurrencyIconClass(currencyCode) {
 	switch (currencyCode) {
 		case 'USD':
@@ -25,7 +30,7 @@ function getCurrencyIconClass(currencyCode) {
 	}
 }
 
-// 生成随机颜色
+// generate random color
 function getRandomColor() {
 	const letters = '0123456789ABCDEF';
 	let color = '#';
@@ -35,24 +40,26 @@ function getRandomColor() {
 	return color;
 }
 
-// 添加货币符号
+// add currency symbol
 function addDollar() {
-	if (!app || !isRunning || !isEnabled) return;
+	if (!rainContainer || !isRunning || !isEnabled) return;
 	
 	const span = document.createElement('SPAN');
 	span.classList.add('dollar-container');
 	
-	// 应用大小设置
+	// apply size setting
 	const baseSize = 20 + Math.random() * 40;
 	span.style.fontSize = (baseSize * rainSize) + 'px';
 	
-	span.style.left = Math.random() * window.innerWidth + 'px';
+	const leftPos = Math.random() * window.innerWidth;
+	span.style.setProperty('--left-pos', leftPos + 'px');
+	span.style.left = leftPos + 'px';
 	
-	// 应用速度设置
+	// apply speed setting
 	const baseDuration = 1 + Math.random() * 3;
 	span.style.animationDuration = (baseDuration / rainSpeed) + 's';
 	
-	// 应用颜色设置
+	// apply color setting
 	span.style.color = randomColor ? getRandomColor() : currentColor;
 	
 	const icon = document.createElement('I');
@@ -60,7 +67,7 @@ function addDollar() {
 	icon.style.animationDuration = (1 + Math.random() * 3) + 's';
 	
 	span.appendChild(icon);
-	app.appendChild(span);
+	rainContainer.appendChild(span);
 	
 	setTimeout(() => {
 		if (span && span.parentNode) {
@@ -69,21 +76,21 @@ function addDollar() {
 	}, 5000);
 }
 
-// 设置货币类型
+// set currency type
 function setCurrency(currency) {
 	currentCurrency = currency;
 }
 
-// 设置颜色
+// set color
 function setColor(color) {
 	currentColor = color;
 }
 
-// 设置是否运行
+// set running
 function setRunning(running) {
 	isRunning = running;
 	
-	// 重新设置雨滴生成间隔
+	// reset rain generation interval
 	if (isRunning && isEnabled) {
 		startRain();
 	} else {
@@ -91,56 +98,56 @@ function setRunning(running) {
 	}
 }
 
-// 设置是否启用
+// set enabled
 function setEnabled(enabled) {
 	isEnabled = enabled;
 	
-	// 如果禁用，停止雨滴
+	// if disabled, stop rain
 	if (!isEnabled) {
 		stopRain();
 	} else if (isRunning) {
-		// 如果启用且正在运行，开始雨滴
+		// if enabled and running, start rain
 		startRain();
 	}
 }
 
-// 设置速度
+// set speed
 function setSpeed(speed) {
 	rainSpeed = speed;
 }
 
-// 设置大小
+// set size
 function setSize(size) {
 	rainSize = size;
 }
 
-// 设置密度
+// set density
 function setDensity(density) {
 	rainDensity = density;
 	
-	// 如果正在运行，重新设置间隔
+	// if running, reset interval
 	if (isRunning && isEnabled) {
 		startRain();
 	}
 }
 
-// 设置随机颜色
+// set random color
 function setRandomColor(value) {
 	randomColor = value;
 	
 	if (randomColor && !randomColorInterval) {
-		// 启动随机颜色变化
+		    // start random color change
 		randomColorInterval = setInterval(() => {
-			// 这里不做任何事情，因为每个雨滴都会在创建时获取随机颜色
+			// do nothing, because each rain drop will get random color when created
 		}, 1000);
 	} else if (!randomColor && randomColorInterval) {
-		// 停止随机颜色变化
+		// stop random color change
 		clearInterval(randomColorInterval);
 		randomColorInterval = null;
 	}
 }
 
-// 重置所有设置
+// reset all settings
 function resetSettings() {
 	currentColor = '#85bb65';
 	rainSpeed = 1;
@@ -159,18 +166,18 @@ function resetSettings() {
 	}
 }
 
-// 开始生成雨滴
+// start rain
 function startRain() {
-	stopRain(); // 先停止现有的
+	stopRain(); // stop existing
 	
-	if (!isEnabled) return; // 如果禁用，不启动
+	if (!isEnabled) return; // if disabled, not start
 	
-	// 设置间隔 (密度越高，间隔越短)
+	// set interval (the higher the density, the shorter the interval)
 	const interval = Math.max(10, 210 - rainDensity);
 	rainInterval = setInterval(addDollar, interval);
 }
 
-// 停止生成雨滴
+// stop rain
 function stopRain() {
 	if (rainInterval) {
 		clearInterval(rainInterval);
@@ -178,7 +185,7 @@ function stopRain() {
 	}
 }
 
-// 监听来自 Vue 应用的消息
+// listen to messages from Vue app
 window.addEventListener('message', (event) => {
 	const { type, data } = event.data;
 	
@@ -213,10 +220,10 @@ window.addEventListener('message', (event) => {
 	}
 });
 
-// 初始化
+// initialize
 startRain();
 
-// 导出函数供 Vue 应用使用
+// export functions for Vue app
 window.currencyRain = {
 	setCurrency,
 	setColor,

@@ -14,6 +14,8 @@ body {
 	min-height: 100vh;
 	font-family: 'Nanum Gothic', sans-serif;
 	margin: 0;
+	width: 100%;
+	position: relative;
 }
 
 h1 {
@@ -26,10 +28,17 @@ h1 {
 
 .dollar-container {
 	animation: fall 2s linear;
-	/* 颜色现在通过 JavaScript 动态设置 */
+	/* color now set through JavaScript */
 	text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 	top: -100px;
 	position: absolute;
+	z-index: 1;
+	max-width: 100vw;
+	overflow: visible;
+	left: clamp(10px, var(--left-pos), calc(100vw - 50px)) !important;
+	pointer-events: none;
+	padding: 10px;
+	box-sizing: content-box;
 }
 
 @keyframes fall {
@@ -43,6 +52,8 @@ h1 {
 .fa-pound-sign,
 .fa-yen-sign {
 	animation: rotate 2s linear infinite;
+	display: inline-block;
+	transform-origin: center;
 }
 
 @keyframes rotate {
@@ -51,10 +62,22 @@ h1 {
 	}
 }
 
-/* 深色模式适配 */
+/* dark mode adaptation */
 body.dark-theme .dollar-container {
-	/* 颜色现在通过 JavaScript 动态设置 */
+	/* color now set through JavaScript */
 	transition: color 0.3s ease;
 }
 
-/* 深色模式适配通过 JavaScript 动态设置颜色 */
+    /* ensure currency rain does not cause page overflow */
+.currency-rain-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	pointer-events: none;
+	z-index: 1;
+}
+
+/* dark mode adaptation through JavaScript dynamic color setting */
